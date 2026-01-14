@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Backend Connection</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .stats-section {
+          background: #f8f9fa;
+          padding: 4rem 0;
+          margin: 4rem 0;
+        }
+        .car-specs {
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 2rem;
+        }
+        .spec-item {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          text-align: left;
+          min-width: 200px;
+        }
+        .spec-item i {
+          font-size: 2.5rem;
+          color: #0d6efd;
+          width: 60px;
+          text-align: center;
+        }
+        .spec-value {
+          font-size: 2.5rem;
+          font-weight: 800;
+          color: #0d6efd;
+          display: block;
+          line-height: 1;
+        }
+        .spec-label {
+          color: #64748b;
+          font-weight: 600;
+          font-size: 1rem;
+          margin-top: 0.25rem;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <h1>Test Backend Connection</h1>
+    <button onclick="testServices()">Test Services API</button>
+    <button onclick="testProducts()">Test Products API</button>
+    
+    <div id="results"></div>
+
+    <!-- Demo Stats Section (Horizontal Layout) -->
+    <div class="stats-section">
+        <h2>Stats Section Demo (Horizontal Layout)</h2>
+        <div class="car-specs">
+            <div class="spec-item">
+                <i class="fas fa-tools"></i>
+                <div>
+                    <span class="spec-value">15</span>
+                    <div class="spec-label">Dịch vụ chuyên nghiệp</div>
+                </div>
+            </div>
+            <div class="spec-item">
+                <i class="fas fa-users"></i>
+                <div>
+                    <span class="spec-value">500+</span>
+                    <div class="spec-label">Khách hàng hài lòng</div>
+                </div>
+            </div>
+            <div class="spec-item">
+                <i class="fas fa-award"></i>
+                <div>
+                    <span class="spec-value">5+</span>
+                    <div class="spec-label">Năm kinh nghiệm</div>
+                </div>
+            </div>
+            <div class="spec-item">
+                <i class="fas fa-headset"></i>
+                <div>
+                    <span class="spec-value">24/7</span>
+                    <div class="spec-label">Hỗ trợ khách hàng</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testServices() {
+            const resultsDiv = document.getElementById('results');
+            try {
+                const response = await fetch('http://localhost:5102/api/DichVu');
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML += `<div class="result success">✅ Services API: Success! Found ${data.length} services</div>`;
+                    console.log('Services:', data);
+                } else {
+                    resultsDiv.innerHTML += `<div class="result error">❌ Services API: Failed with status ${response.status}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += `<div class="result error">❌ Services API: Error - ${error.message}</div>`;
+            }
+        }
+
+        async function testProducts() {
+            const resultsDiv = document.getElementById('results');
+            try {
+                const response = await fetch('http://localhost:5102/api/SanPham');
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML += `<div class="result success">✅ Products API: Success! Found ${data.length} products</div>`;
+                    console.log('Products:', data);
+                } else {
+                    resultsDiv.innerHTML += `<div class="result error">❌ Products API: Failed with status ${response.status}</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += `<div class="result error">❌ Products API: Error - ${error.message}</div>`;
+            }
+        }
+
+        // Auto test on load
+        window.onload = function() {
+            testServices();
+            testProducts();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API từ Frontend</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9; }
+        .error { border-color: #dc3545; background: #f8d7da; color: #721c24; }
+        .success { border-color: #28a745; background: #d4edda; color: #155724; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>Test API Connection từ Frontend</h1>
+    <p>Frontend: <strong>http://localhost:3001</strong></p>
+    <p>Backend: <strong>http://localhost:5102</strong></p>
+    
+    <button onclick="testServices()">Test Services API</button>
+    <button onclick="testCORS()">Test CORS</button>
+    <button onclick="testSpecificService()">Test Service Detail</button>
+    
+    <div id="result"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:5102/api';
+        
+        function showResult(title, content, isError = false) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${isError ? 'error' : 'success'}`;
+            resultDiv.innerHTML = `
+                <h3>${title}</h3>
+                <pre>${content}</pre>
+            `;
+        }
+        
+        async function testServices() {
+            try {
+                showResult('Testing...', 'Đang gọi API /DichVu...');
+                
+                const response = await fetch(`${API_BASE}/DichVu`);
+                const data = await response.json();
+                
+                showResult(
+                    `✅ Services API Success (${response.status})`,
+                    `Số lượng dịch vụ: ${data.length}\n\nDữ liệu mẫu:\n${JSON.stringify(data.slice(0, 2), null, 2)}`
+                );
+            } catch (error) {
+                showResult(
+                    '❌ Services API Error',
+                    `Lỗi: ${error.message}\n\nCó thể do:\n- Backend chưa chạy\n- CORS chưa được cấu hình\n- Port không đúng`,
+                    true
+                );
+            }
+        }
+        
+        async function testCORS() {
+            try {
+                showResult('Testing CORS...', 'Đang kiểm tra CORS...');
+                
+                const response = await fetch(`${API_BASE}/DichVu`, {
+                    method: 'OPTIONS'
+                });
+                
+                showResult(
+                    `✅ CORS Test Success (${response.status})`,
+                    `CORS Headers:\n${JSON.stringify(Object.fromEntries(response.headers), null, 2)}`
+                );
+            } catch (error) {
+                showResult(
+                    '❌ CORS Test Error',
+                    `Lỗi CORS: ${error.message}\n\nCần kiểm tra:\n- Backend CORS config\n- Port frontend trong CORS`,
+                    true
+                );
+            }
+        }
+        
+        async function testSpecificService() {
+            try {
+                showResult('Testing...', 'Đang gọi API /DichVu/1...');
+                
+                const response = await fetch(`${API_BASE}/DichVu/1`);
+                const data = await response.json();
+                
+                showResult(
+                    `✅ Service Detail Success (${response.status})`,
+                    `Chi tiết dịch vụ:\n${JSON.stringify(data, null, 2)}`
+                );
+            } catch (error) {
+                showResult(
+                    '❌ Service Detail Error',
+                    `Lỗi: ${error.message}`,
+                    true
+                );
+            }
+        }
+        
+        // Auto test khi load trang
+        window.onload = function() {
+            setTimeout(testServices, 1000);
+        };
+    </script>
+</body>
+</html>
