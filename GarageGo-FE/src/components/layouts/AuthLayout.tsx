@@ -11,7 +11,9 @@ export const AuthLayout: React.FC = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-full mb-4">
             <Car className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-secondary-900 mb-2">GarageGo</h1>
+          <h1 className="text-3xl font-bold text-secondary-900 mb-2">
+            GarageGo
+          </h1>
           <p className="text-secondary-600">Hệ thống quản lý gara ô tô</p>
         </div>
 

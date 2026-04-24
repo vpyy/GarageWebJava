@@ -1,5 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { Toaster } from 'react-hot-toast';
@@ -53,26 +58,38 @@ function App() {
           <Routes>
             {/* Default route - redirect to login */}
             <Route path="/" element={<Navigate to="/auth/login" replace />} />
-            
+
             {/* Auth Routes */}
-            <Route path="/auth/login" element={
-              <PublicRoute>
-                <LoginPage />
-              </PublicRoute>
-            } />
-            <Route path="/auth/register" element={
-              <PublicRoute>
-                <RegisterPage />
-              </PublicRoute>
-            } />
-            <Route path="/auth/logout" element={<Navigate to="/auth/login" replace />} />
+            <Route
+              path="/auth/login"
+              element={
+                <PublicRoute>
+                  <LoginPage />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/auth/register"
+              element={
+                <PublicRoute>
+                  <RegisterPage />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/auth/logout"
+              element={<Navigate to="/auth/login" replace />}
+            />
 
             {/* Admin Routes */}
-            <Route path="/admin/*" element={
-              <ProtectedRoute requiredRole="Admin">
-                <AdminLayout />
-              </ProtectedRoute>
-            }>
+            <Route
+              path="/admin/*"
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="statistics" element={<Statistics />} />
@@ -92,29 +109,41 @@ function App() {
               <Route index element={<CustomerHomePage />} />
               <Route path="home" element={<CustomerHomePage />} />
               <Route path="services" element={<ServicesPage />} />
-              <Route path="services/:id/book" element={<ServiceBookingPage />} />
+              <Route
+                path="services/:id/book"
+                element={<ServiceBookingPage />}
+              />
               <Route path="products" element={<ProductsPage />} />
               <Route path="products/:id" element={<ProductDetailPage />} />
               <Route path="cart" element={<CartPage />} />
               <Route path="checkout" element={<CheckoutPage />} />
               <Route path="contact" element={<ContactPage />} />
-              
+
               {/* Protected Customer Routes */}
-              <Route path="profile" element={
-                <ProtectedRoute requiredRole="Customer">
-                  <ProfilePage />
-                </ProtectedRoute>
-              } />
-              <Route path="orders" element={
-                <ProtectedRoute requiredRole="Customer">
-                  <OrdersPage />
-                </ProtectedRoute>
-              } />
-              <Route path="service-requests" element={
-                <ProtectedRoute requiredRole="Customer">
-                  <ServiceRequestsPage />
-                </ProtectedRoute>
-              } />
+              <Route
+                path="profile"
+                element={
+                  <ProtectedRoute requiredRole="Customer">
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="orders"
+                element={
+                  <ProtectedRoute requiredRole="Customer">
+                    <OrdersPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="service-requests"
+                element={
+                  <ProtectedRoute requiredRole="Customer">
+                    <ServiceRequestsPage />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
 
             {/* Public Routes (without layout) */}

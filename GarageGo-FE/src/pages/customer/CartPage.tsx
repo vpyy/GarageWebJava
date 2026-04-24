@@ -2,7 +2,12 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { RootState } from '../../store';
-import { removeFromCart, updateQuantity, clearCart, clearError } from '../../store/slices/cartSlice';
+import {
+  removeFromCart,
+  updateQuantity,
+  clearCart,
+  clearError,
+} from '../../store/slices/cartSlice';
 import { formatCurrency } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 
@@ -39,7 +44,9 @@ export const CartPage: React.FC = () => {
   };
 
   const handleClearCart = () => {
-    if (window.confirm('Bạn có chắc muốn xóa tất cả sản phẩm trong giỏ hàng?')) {
+    if (
+      window.confirm('Bạn có chắc muốn xóa tất cả sản phẩm trong giỏ hàng?')
+    ) {
       dispatch(clearCart());
       toast.success('Đã xóa tất cả sản phẩm trong giỏ hàng');
     }
@@ -208,73 +215,120 @@ export const CartPage: React.FC = () => {
               <div className="cart-card">
                 {items.map((item, index) => (
                   <div key={item.id} className="cart-item">
-                    <div className="row align-items-center">
-                      <div className="col-md-2">
-                        <img 
-                          src={item.image || "https://images.pexels.com/photos/3806288/pexels-photo-3806288.jpeg"} 
-                          alt={item.name}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <h6>{item.name}</h6>
-                        <p className="text-muted mb-0">{formatCurrency(item.price)}</p>
-                        {item.stock && (
-                          <small className="text-muted">Còn {item.stock} sản phẩm</small>
-                        )}
-                      </div>
-                      <div className="col-md-3">
-                        <div className="quantity-control">
-                          <button
-                            type="button"
-                            className="btn btn-outline-secondary btn-sm"
-                            onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                            disabled={item.quantity <= 1}
-                          >
-                            <i className="fas fa-minus"></i>
-                          </button>
-                          <input 
-                            type="number" 
-                            className="form-control form-control-sm text-center" 
-                            value={item.quantity}
-                            onChange={(e) => handleUpdateQuantity(item.id, parseInt(e.target.value) || 1)}
-                            min="1"
-                            max={item.stock || 999}
-                          />
-                          <button
-                            type="button"
-                            className="btn btn-outline-secondary btn-sm"
-                            onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                            disabled={item.stock ? item.quantity >= item.stock : false}
-                          >
-                            <i className="fas fa-plus"></i>
-                          </button>
-                        </div>
-                      </div>
-                      <div className="col-md-2">
-                        <h6 style={{ color: '#0ea5e9', margin: 0 }}>
-                          {formatCurrency(calculateItemTotal(item.price, item.quantity))}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '16px',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <img
+                        src={
+                          item.image ||
+                          'https://images.pexels.com/photos/3806288/pexels-photo-3806288.jpeg'
+                        }
+                        alt={item.name}
+                        style={{
+                          width: '80px',
+                          height: '80px',
+                          objectFit: 'cover',
+                          borderRadius: '8px',
+                          flexShrink: 0,
+                        }}
+                      />
+                      <div style={{ flex: 1, minWidth: '120px' }}>
+                        <h6 style={{ margin: 0, fontWeight: 700 }}>
+                          {item.name}
                         </h6>
+                        <p
+                          className="text-muted mb-0"
+                          style={{ fontSize: '14px' }}
+                        >
+                          {formatCurrency(item.price)}
+                        </p>
                       </div>
-                      <div className="col-md-1">
+                      <div
+                        className="quantity-control"
+                        style={{ flexShrink: 0 }}
+                      >
                         <button
                           type="button"
-                          className="btn btn-outline-danger btn-sm"
-                          onClick={() => handleRemoveItem(item.id, item.name)}
-                          title="Xóa sản phẩm"
+                          className="btn btn-outline-secondary btn-sm"
+                          onClick={() =>
+                            handleUpdateQuantity(item.id, item.quantity - 1)
+                          }
+                          disabled={item.quantity <= 1}
                         >
-                          <i className="fas fa-trash"></i>
+                          <i className="fas fa-minus"></i>
+                        </button>
+                        <input
+                          type="number"
+                          className="form-control form-control-sm text-center"
+                          value={item.quantity}
+                          onChange={e =>
+                            handleUpdateQuantity(
+                              item.id,
+                              parseInt(e.target.value) || 1
+                            )
+                          }
+                          min="1"
+                          max={item.stock || 999}
+                          style={{ width: '60px' }}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary btn-sm"
+                          onClick={() =>
+                            handleUpdateQuantity(item.id, item.quantity + 1)
+                          }
+                          disabled={
+                            item.stock ? item.quantity >= item.stock : false
+                          }
+                        >
+                          <i className="fas fa-plus"></i>
                         </button>
                       </div>
+                      <div
+                        style={{
+                          minWidth: '100px',
+                          textAlign: 'right',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <h6
+                          style={{
+                            color: '#0ea5e9',
+                            margin: 0,
+                            fontWeight: 700,
+                          }}
+                        >
+                          {formatCurrency(
+                            calculateItemTotal(item.price, item.quantity)
+                          )}
+                        </h6>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-outline-danger btn-sm"
+                        style={{ flexShrink: 0 }}
+                        onClick={() => handleRemoveItem(item.id, item.name)}
+                        title="Xóa sản phẩm"
+                      >
+                        <i className="fas fa-trash"></i>
+                      </button>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            
+
             <div className="col-lg-4">
               <div className="summary-card">
                 <div className="card-header">
-                  <h5><i className="fas fa-receipt me-2"></i>Tổng kết đơn hàng</h5>
+                  <h5>
+                    <i className="fas fa-receipt me-2"></i>Tổng kết đơn hàng
+                  </h5>
                 </div>
                 <div className="card-body">
                   <div className="summary-row">
@@ -283,17 +337,25 @@ export const CartPage: React.FC = () => {
                   </div>
                   <div className="summary-row">
                     <span>Phí vận chuyển:</span>
-                    <span style={{ color: '#10b981', fontWeight: 600 }}>Miễn phí</span>
+                    <span style={{ color: '#10b981', fontWeight: 600 }}>
+                      Miễn phí
+                    </span>
                   </div>
                   <div className="summary-total">
                     <span>Tổng cộng:</span>
                     <span className="amount">{formatCurrency(total)}</span>
                   </div>
                   <div className="d-grid gap-2 mt-3">
-                    <Link to="/customer/checkout" className="btn btn-primary btn-lg">
+                    <Link
+                      to="/customer/checkout"
+                      className="btn btn-primary btn-lg"
+                    >
                       <i className="fas fa-credit-card me-2"></i>Thanh toán
                     </Link>
-                    <Link to="/customer/products" className="btn btn-outline-primary">
+                    <Link
+                      to="/customer/products"
+                      className="btn btn-outline-primary"
+                    >
                       <i className="fas fa-arrow-left me-2"></i>Tiếp tục mua sắm
                     </Link>
                     <button

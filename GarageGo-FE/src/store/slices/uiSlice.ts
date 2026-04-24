@@ -26,7 +26,7 @@ const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    toggleSidebar: (state) => {
+    toggleSidebar: state => {
       state.sidebarOpen = !state.sidebarOpen;
     },
     setSidebarOpen: (state, action: PayloadAction<boolean>) => {
@@ -39,7 +39,10 @@ const uiSlice = createSlice({
       state.theme = action.payload;
       localStorage.setItem('theme', action.payload);
     },
-    addNotification: (state, action: PayloadAction<Omit<Notification, 'id' | 'timestamp'>>) => {
+    addNotification: (
+      state,
+      action: PayloadAction<Omit<Notification, 'id' | 'timestamp'>>
+    ) => {
       const notification: Notification = {
         ...action.payload,
         id: Date.now().toString(),
@@ -52,7 +55,7 @@ const uiSlice = createSlice({
         notification => notification.id !== action.payload
       );
     },
-    clearNotifications: (state) => {
+    clearNotifications: state => {
       state.notifications = [];
     },
   },

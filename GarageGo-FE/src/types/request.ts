@@ -8,10 +8,12 @@ export interface ServiceRequest {
   ngayYeuCau: string;
   trangThai: string;
   ghiChu?: string;
+  username?: string;
   dichVu?: {
     id: number;
     tenDichVu: string;
     gia: number;
+    donGia?: number;
     moTa: string;
   };
 }

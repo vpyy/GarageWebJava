@@ -1,22 +1,38 @@
 import { apiService } from './api';
-import { Contact, CreateContactRequest, UpdateContactRequest } from '../types/contact';
+import { Contact, CreateContactRequest } from '../types/contact';
 
 export class ContactService {
   // Contact CRUD operations
   async getContacts(): Promise<Contact[]> {
-    return await apiService.get<Contact[]>('/LienHe');
+    return await apiService.get<Contact[]>('/lien-he');
   }
 
-  async create(data: CreateContactRequest): Promise<{ maLienHe: number; message: string }> {
-    return await apiService.post<{ maLienHe: number; message: string }>('/LienHe', data);
+  async create(
+    data: CreateContactRequest
+  ): Promise<{ maLienHe: number; message: string }> {
+    return await apiService.post<{ maLienHe: number; message: string }>(
+      '/lien-he',
+      data
+    );
   }
 
-  async createContact(data: CreateContactRequest): Promise<{ maLienHe: number; message: string }> {
-    return await apiService.post<{ maLienHe: number; message: string }>('/LienHe', data);
+  async createContact(
+    data: CreateContactRequest
+  ): Promise<{ maLienHe: number; message: string }> {
+    return await apiService.post<{ maLienHe: number; message: string }>(
+      '/lien-he',
+      data
+    );
   }
 
-  async updateContactStatus(id: number, daXuLy: boolean): Promise<{ updated: number }> {
-    return await apiService.put<{ updated: number }>(`/LienHe/update-status?id=${id}&daxuly=${daXuLy}`, {});
+  async updateContactStatus(
+    id: number,
+    daXuLy: boolean
+  ): Promise<{ updated: number }> {
+    return await apiService.put<{ updated: number }>(
+      `/lien-he/update-status?id=${id}&daxuly=${daXuLy}`,
+      {}
+    );
   }
 
   // Statistics
@@ -41,7 +57,7 @@ export class ContactService {
       lastMonth: contacts.filter(c => {
         const date = new Date(c.ngayGui);
         return date >= lastMonth && date <= lastMonthEnd;
-      }).length
+      }).length,
     };
   }
 }

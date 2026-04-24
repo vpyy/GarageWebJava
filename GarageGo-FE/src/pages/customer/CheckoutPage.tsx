@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
 import { clearCart } from '../../store/slices/cartSlice';
+import { apiService } from '../../services/api';
 import toast from 'react-hot-toast';
 
 interface CheckoutForm {
@@ -18,38 +19,39 @@ export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const cartItems = useSelector((state: RootState) => state.cart.items);
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [submitting, setSubmitting] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
   const [form, setForm] = useState<CheckoutForm>({
     hoTen: '',
     soDienThoai: '',
     email: '',
     diaChi: '',
     ghiChu: '',
-    phuongThucThanhToan: 'COD'
+    phuongThucThanhToan: 'COD',
   });
 
-  const totalAmount = cartItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+  const totalAmount = cartItems.reduce(
+    (sum: number, item: any) => sum + item.price * item.quantity,
+    0
+  );
+
+  const fmt = (n: number) =>
+    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n);
 
   useEffect(() => {
-    if (cartItems.length === 0) {
-      navigate('/customer/cart');
-    }
+    if (cartItems.length === 0) navigate('/customer/cart');
   }, [cartItems, navigate]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setForm(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      toast.error('Vui lòng đăng nhập để đặt hàng');
+      navigate('/auth/login');
+      return;
+    }
     setSubmitting(true);
-
     try {
-      // Tạo đơn hàng
       const orderData = {
         hoTen: form.hoTen,
         soDienThoai: form.soDienThoai,
@@ -60,297 +62,494 @@ export const CheckoutPage: React.FC = () => {
         sanPhams: cartItems.map((item: any) => ({
           maSP: item.id,
           soLuong: item.quantity,
-          donGia: item.price
+          donGia: item.price,
         })),
-        tongTien: totalAmount
+        tongTien: totalAmount,
       };
-
-      // Gọi API tạo đơn hàng
-      const response = await fetch('http://localhost:5102/api/DonHang', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData)
-      });
-
-      if (response.ok) {
-        // Xóa giỏ hàng
-        dispatch(clearCart());
-        
-        // Thông báo thành công
-        toast.success('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.');
-        navigate('/customer/home');
-      } else {
-        toast.error('Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.');
-      }
-    } catch (error) {
-      console.error('Error submitting order:', error);
-      toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
+      // Dùng apiService để tự động gửi JWT token
+      await apiService.post('/don-hang', orderData);
+      dispatch(clearCart());
+      setShowDialog(false);
+      toast.success('Đặt hàng thành công! Cảm ơn bạn đã mua hàng.');
+      navigate('/customer/orders');
+    } catch {
+      toast.error('Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (cartItems.length === 0) {
-    return null; // Will redirect to cart
-  }
+  if (cartItems.length === 0) return null;
 
   return (
-    <div className="container py-5" style={{ marginTop: '80px', marginBottom: '50px', minHeight: '100vh' }}>
-      <div className="row justify-content-center">
-        <div className="col-12 mb-4">
-          <h2 className="text-center mb-2">
-            <i className="fas fa-shopping-cart me-2 text-primary"></i>
-            Thanh toán đơn hàng
+    <div style={{ minHeight: '80vh', background: '#f8fafc', padding: '2.5rem 1rem' }}>
+      <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+
+        {/* Tiêu đề */}
+        <div style={{ marginBottom: '28px' }}>
+          <h2 style={{ fontSize: '26px', fontWeight: 800, color: '#1e293b', margin: 0 }}>
+            <i className="fas fa-shopping-cart me-2" style={{ color: '#0ea5e9' }} />
+            Giỏ hàng của bạn
           </h2>
-          <p className="text-center text-muted">Vui lòng điền đầy đủ thông tin để hoàn tất đơn hàng</p>
+          <p style={{ color: '#64748b', marginTop: '6px', fontSize: '14px' }}>
+            {cartItems.length} sản phẩm trong giỏ hàng
+          </p>
+        </div>
+
+        {/* Danh sách sản phẩm */}
+        <div
+          style={{
+            background: 'white', borderRadius: '16px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+            marginBottom: '20px', overflow: 'hidden',
+          }}
+        >
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', background: '#f8fafc' }}>
+            <span style={{ fontWeight: 700, color: '#374151', fontSize: '15px' }}>
+              <i className="fas fa-box me-2" style={{ color: '#0ea5e9' }} />
+              Chi tiết đơn hàng
+            </span>
+          </div>
+
+          {cartItems.map((item: any, idx: number) => (
+            <div
+              key={item.id}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '16px',
+                padding: '16px 20px',
+                borderBottom: idx < cartItems.length - 1 ? '1px solid #f1f5f9' : 'none',
+              }}
+            >
+              <img
+                src={item.image || 'https://images.pexels.com/photos/3806288/pexels-photo-3806288.jpeg'}
+                alt={item.name}
+                style={{ width: '68px', height: '68px', objectFit: 'cover', borderRadius: '10px', flexShrink: 0 }}
+              />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, color: '#1e293b', fontSize: '15px' }}>{item.name}</div>
+                <div style={{ fontSize: '13px', color: '#94a3b8', marginTop: '4px' }}>
+                  Đơn giá: {fmt(item.price)} × {item.quantity}
+                </div>
+              </div>
+              <div style={{ fontWeight: 800, color: '#0ea5e9', fontSize: '17px', flexShrink: 0 }}>
+                {fmt(item.price * item.quantity)}
+              </div>
+            </div>
+          ))}
+
+          {/* Tổng cộng */}
+          <div
+            style={{
+              padding: '16px 20px',
+              background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            }}
+          >
+            <div style={{ display: 'flex', gap: '24px', fontSize: '14px', color: '#64748b' }}>
+              <span>
+                <i className="fas fa-truck me-1" style={{ color: '#22c55e' }} />
+                Phí vận chuyển: <strong style={{ color: '#22c55e' }}>Miễn phí</strong>
+              </span>
+              <span>
+                <i className="fas fa-receipt me-1" style={{ color: '#0ea5e9' }} />
+                {cartItems.length} sản phẩm
+              </span>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '2px' }}>Tổng thanh toán</div>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: '#0ea5e9' }}>{fmt(totalAmount)}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Nút hành động */}
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+          <button
+            onClick={() => navigate('/customer/products')}
+            style={{
+              padding: '12px 24px', background: 'white',
+              color: '#64748b', border: '1px solid #e5e7eb',
+              borderRadius: '10px', fontWeight: 600, cursor: 'pointer', fontSize: '14px',
+            }}
+          >
+            <i className="fas fa-arrow-left me-2" />Tiếp tục mua sắm
+          </button>
+          <button
+            onClick={() => setShowDialog(true)}
+            style={{
+              padding: '12px 28px',
+              background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+              color: 'white', border: 'none', borderRadius: '10px',
+              fontWeight: 700, cursor: 'pointer', fontSize: '15px',
+              boxShadow: '0 4px 12px rgba(14,165,233,0.3)',
+            }}
+          >
+            <i className="fas fa-credit-card me-2" />Tiến hành đặt hàng
+          </button>
         </div>
       </div>
 
-      <div className="row g-4">
-        <div className="col-lg-7">
-          <div className="card shadow-sm border-0">
-            <div className="card-header bg-gradient text-white" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-              <h5 className="mb-0">
-                <i className="fas fa-user-circle me-2"></i>
-                Thông tin đặt hàng
-              </h5>
+      {/* Dialog đặt hàng */}
+      {showDialog && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)',
+            zIndex: 9999, display: 'flex', alignItems: 'center',
+            justifyContent: 'center', padding: '1rem',
+          }}
+          onClick={() => setShowDialog(false)}
+        >
+          <div
+            style={{
+              background: 'white', borderRadius: '20px',
+              width: '100%', maxWidth: '700px',
+              maxHeight: '92vh', overflow: 'auto',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div
+              style={{
+                padding: '22px 28px',
+                background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+                borderRadius: '20px 20px 0 0',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              }}
+            >
+              <div>
+                <h3 style={{ margin: 0, fontWeight: 800, color: 'white', fontSize: '20px' }}>
+                  <i className="fas fa-clipboard-list me-2" />Thông tin đặt hàng
+                </h3>
+                <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.8)', fontSize: '13px' }}>
+                  Vui lòng điền đầy đủ thông tin giao hàng
+                </p>
+              </div>
+              <button
+                onClick={() => setShowDialog(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.2)', border: 'none',
+                  color: 'white', width: '36px', height: '36px',
+                  borderRadius: '50%', cursor: 'pointer', fontSize: '18px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                ×
+              </button>
             </div>
-            <div className="card-body p-4">
-              <form onSubmit={handleSubmit} id="checkoutForm">
-                <div className="mb-4">
-                  <h6 className="text-primary mb-3">
-                    <i className="fas fa-address-card me-2"></i>
-                    Thông tin người nhận
-                  </h6>
-                  
-                  <div className="mb-3">
-                    <label htmlFor="hoTen" className="form-label fw-semibold">
-                      Họ và tên <span className="text-danger">*</span>
+
+            <form onSubmit={handleSubmit} style={{ padding: '28px' }}>
+
+              {/* Section: Thông tin liên hệ */}
+              <div style={{ marginBottom: '28px' }}>
+                <div
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    marginBottom: '16px', paddingBottom: '10px',
+                    borderBottom: '2px solid #f1f5f9',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '28px', height: '28px', borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #0ea5e9, #06b6d4)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                  >
+                    <i className="fas fa-user" style={{ color: 'white', fontSize: '12px' }} />
+                  </div>
+                  <span style={{ fontWeight: 700, color: '#1e293b', fontSize: '15px' }}>
+                    Thông tin liên hệ
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                      Họ và tên <span style={{ color: '#ef4444' }}>*</span>
                     </label>
                     <input
+                      style={{
+                        width: '100%', padding: '10px 14px',
+                        border: '1.5px solid #e5e7eb', borderRadius: '10px',
+                        fontSize: '14px', outline: 'none', boxSizing: 'border-box',
+                        transition: 'border-color 0.2s',
+                      }}
                       type="text"
-                      className="form-control form-control-lg"
-                      id="hoTen"
-                      name="hoTen"
                       value={form.hoTen}
-                      onChange={handleInputChange}
+                      onChange={e => setForm({ ...form, hoTen: e.target.value })}
                       placeholder="Nguyễn Văn A"
                       required
+                      onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                      onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
                     />
                   </div>
-
-                  <div className="row">
-                    <div className="col-md-6 mb-3">
-                      <label htmlFor="soDienThoai" className="form-label fw-semibold">
-                        Số điện thoại <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="tel"
-                        className="form-control form-control-lg"
-                        id="soDienThoai"
-                        name="soDienThoai"
-                        value={form.soDienThoai}
-                        onChange={handleInputChange}
-                        placeholder="0901234567"
-                        pattern="[0-9]{10}"
-                        required
-                      />
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <label htmlFor="email" className="form-label fw-semibold">
-                        Email <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        className="form-control form-control-lg"
-                        id="email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleInputChange}
-                        placeholder="example@email.com"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="diaChi" className="form-label fw-semibold">
-                      Địa chỉ nhận hàng <span className="text-danger">*</span>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                      Số điện thoại <span style={{ color: '#ef4444' }}>*</span>
                     </label>
-                    <textarea
-                      className="form-control"
-                      id="diaChi"
-                      name="diaChi"
-                      value={form.diaChi}
-                      onChange={handleInputChange}
-                      rows={3}
-                      placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố"
+                    <input
+                      style={{
+                        width: '100%', padding: '10px 14px',
+                        border: '1.5px solid #e5e7eb', borderRadius: '10px',
+                        fontSize: '14px', outline: 'none', boxSizing: 'border-box',
+                      }}
+                      type="tel"
+                      value={form.soDienThoai}
+                      onChange={e => setForm({ ...form, soDienThoai: e.target.value })}
+                      placeholder="0901 234 567"
                       required
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="ghiChu" className="form-label fw-semibold">Ghi chú</label>
-                    <textarea
-                      className="form-control"
-                      id="ghiChu"
-                      name="ghiChu"
-                      value={form.ghiChu}
-                      onChange={handleInputChange}
-                      rows={2}
-                      placeholder="Ghi chú về đơn hàng (tùy chọn)"
+                      onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                      onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
                     />
                   </div>
                 </div>
 
-                <hr className="my-4" />
+                <div style={{ marginTop: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                    Email <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <input
+                    style={{
+                      width: '100%', padding: '10px 14px',
+                      border: '1.5px solid #e5e7eb', borderRadius: '10px',
+                      fontSize: '14px', outline: 'none', boxSizing: 'border-box',
+                    }}
+                    type="email"
+                    value={form.email}
+                    onChange={e => setForm({ ...form, email: e.target.value })}
+                    placeholder="example@email.com"
+                    required
+                    onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                    onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
+                  />
+                </div>
+              </div>
 
-                <div className="mb-4">
-                  <h6 className="text-primary mb-3">
-                    <i className="fas fa-credit-card me-2"></i>
+              {/* Section: Địa chỉ giao hàng */}
+              <div style={{ marginBottom: '28px' }}>
+                <div
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    marginBottom: '16px', paddingBottom: '10px',
+                    borderBottom: '2px solid #f1f5f9',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '28px', height: '28px', borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                  >
+                    <i className="fas fa-map-marker-alt" style={{ color: 'white', fontSize: '12px' }} />
+                  </div>
+                  <span style={{ fontWeight: 700, color: '#1e293b', fontSize: '15px' }}>
+                    Địa chỉ giao hàng
+                  </span>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                    Địa chỉ nhận hàng <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <textarea
+                    style={{
+                      width: '100%', padding: '10px 14px',
+                      border: '1.5px solid #e5e7eb', borderRadius: '10px',
+                      fontSize: '14px', outline: 'none', boxSizing: 'border-box',
+                      resize: 'none',
+                    }}
+                    rows={2}
+                    value={form.diaChi}
+                    onChange={e => setForm({ ...form, diaChi: e.target.value })}
+                    placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố..."
+                    required
+                    onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                    onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
+                  />
+                </div>
+
+                <div style={{ marginTop: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>
+                    Ghi chú đơn hàng
+                  </label>
+                  <textarea
+                    style={{
+                      width: '100%', padding: '10px 14px',
+                      border: '1.5px solid #e5e7eb', borderRadius: '10px',
+                      fontSize: '14px', outline: 'none', boxSizing: 'border-box',
+                      resize: 'none',
+                    }}
+                    rows={2}
+                    value={form.ghiChu}
+                    onChange={e => setForm({ ...form, ghiChu: e.target.value })}
+                    placeholder="Ghi chú thêm về đơn hàng (tùy chọn)..."
+                    onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                    onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
+                  />
+                </div>
+              </div>
+
+              {/* Section: Phương thức thanh toán */}
+              <div style={{ marginBottom: '28px' }}>
+                <div
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    marginBottom: '16px', paddingBottom: '10px',
+                    borderBottom: '2px solid #f1f5f9',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '28px', height: '28px', borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                  >
+                    <i className="fas fa-credit-card" style={{ color: 'white', fontSize: '12px' }} />
+                  </div>
+                  <span style={{ fontWeight: 700, color: '#1e293b', fontSize: '15px' }}>
                     Phương thức thanh toán
-                  </h6>
-                  
-                  <div className="payment-methods">
-                    <div className="form-check p-3 mb-3 border rounded" style={{ cursor: 'pointer', backgroundColor: form.phuongThucThanhToan === 'COD' ? '#f0f9ff' : 'white' }}>
-                      <input
-                        className="form-check-input"
-                        type="radio"
-                        name="phuongThucThanhToan"
-                        id="cod"
-                        value="COD"
-                        checked={form.phuongThucThanhToan === 'COD'}
-                        onChange={handleInputChange}
-                      />
-                      <label className="form-check-label w-100" htmlFor="cod" style={{ cursor: 'pointer' }}>
-                        <div className="d-flex align-items-center">
-                          <i className="fas fa-money-bill-wave text-success fs-4 me-3"></i>
-                          <div>
-                            <strong className="d-block">Thanh toán khi nhận hàng (COD)</strong>
-                            <small className="text-muted">Thanh toán bằng tiền mặt khi nhận hàng</small>
-                          </div>
-                        </div>
-                      </label>
-                    </div>
-                    
-                    <div className="form-check p-3 border rounded" style={{ cursor: 'pointer', backgroundColor: form.phuongThucThanhToan === 'ChuyenKhoan' ? '#f0f9ff' : 'white' }}>
-                      <input
-                        className="form-check-input"
-                        type="radio"
-                        name="phuongThucThanhToan"
-                        id="banking"
-                        value="ChuyenKhoan"
-                        checked={form.phuongThucThanhToan === 'ChuyenKhoan'}
-                        onChange={handleInputChange}
-                      />
-                      <label className="form-check-label w-100" htmlFor="banking" style={{ cursor: 'pointer' }}>
-                        <div className="d-flex align-items-center">
-                          <i className="fas fa-university text-primary fs-4 me-3"></i>
-                          <div>
-                            <strong className="d-block">Chuyển khoản ngân hàng</strong>
-                            <small className="text-muted">Chuyển khoản qua Internet Banking hoặc QR Code</small>
-                          </div>
-                        </div>
-                      </label>
-                    </div>
-                  </div>
+                  </span>
                 </div>
 
-                <div className="d-grid gap-2">
-                  <button
-                    type="submit"
-                    className="btn btn-lg text-white"
-                    style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
-                    disabled={submitting}
-                  >
-                    {submitting ? (
-                      <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Đang xử lý...
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-check-circle me-2"></i>
-                        Xác nhận đặt hàng
-                      </>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/customer/cart')}
-                    className="btn btn-outline-secondary btn-lg"
-                  >
-                    <i className="fas fa-arrow-left me-2"></i>
-                    Quay lại giỏ hàng
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-lg-5">
-          <div className="card shadow-sm border-0 sticky-top" style={{ top: '100px' }}>
-            <div className="card-header bg-light border-0">
-              <h6 className="mb-0 fw-bold">
-                <i className="fas fa-receipt me-2 text-primary"></i>
-                Đơn hàng của bạn
-              </h6>
-            </div>
-            <div className="card-body p-4">
-              {cartItems.length > 0 ? (
-                <>
-                  <div className="order-items mb-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                    {cartItems.map((item: any) => (
-                      <div key={item.id} className="d-flex mb-3 pb-3 border-bottom">
-                        <img
-                          src={item.image || "https://images.pexels.com/photos/3806288/pexels-photo-3806288.jpeg"}
-                          alt={item.name}
-                          className="rounded shadow-sm"
-                          style={{ width: '70px', height: '70px', objectFit: 'cover' }}
-                        />
-                        <div className="ms-3 flex-grow-1">
-                          <h6 className="mb-1">{item.name}</h6>
-                          <div className="d-flex justify-content-between align-items-center">
-                            <small className="text-muted">SL: {item.quantity}</small>
-                            <span className="fw-bold text-primary">
-                              {(item.price * item.quantity).toLocaleString()}₫
-                            </span>
-                          </div>
-                        </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  {[
+                    {
+                      value: 'COD',
+                      icon: 'fa-money-bill-wave',
+                      color: '#22c55e',
+                      bg: '#f0fdf4',
+                      label: 'Tiền mặt (COD)',
+                      sub: 'Thanh toán khi nhận hàng',
+                    },
+                    {
+                      value: 'ChuyenKhoan',
+                      icon: 'fa-university',
+                      color: '#0ea5e9',
+                      bg: '#f0f9ff',
+                      label: 'Chuyển khoản',
+                      sub: 'Internet Banking / QR Code',
+                    },
+                  ].map(opt => (
+                    <label
+                      key={opt.value}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '14px',
+                        padding: '16px',
+                        border: `2px solid ${form.phuongThucThanhToan === opt.value ? opt.color : '#e5e7eb'}`,
+                        borderRadius: '12px', cursor: 'pointer',
+                        background: form.phuongThucThanhToan === opt.value ? opt.bg : 'white',
+                        transition: 'all 0.2s',
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="pttt"
+                        value={opt.value}
+                        checked={form.phuongThucThanhToan === opt.value}
+                        onChange={() => setForm({ ...form, phuongThucThanhToan: opt.value })}
+                        style={{ display: 'none' }}
+                      />
+                      <div
+                        style={{
+                          width: '44px', height: '44px', borderRadius: '12px',
+                          background: `${opt.color}20`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <i className={`fas ${opt.icon}`} style={{ color: opt.color, fontSize: '20px' }} />
                       </div>
-                    ))}
-                  </div>
-                  
-                  <div className="order-summary">
-                    <div className="d-flex justify-content-between mb-2 pb-2">
-                      <span className="text-muted">Tạm tính:</span>
-                      <strong>{totalAmount.toLocaleString()}₫</strong>
-                    </div>
-                    <div className="d-flex justify-content-between mb-3 pb-3 border-bottom">
-                      <span className="text-muted">Phí vận chuyển:</span>
-                      <strong className="text-success">Miễn phí</strong>
-                    </div>
-                    <div className="d-flex justify-content-between align-items-center p-3 rounded" style={{ backgroundColor: '#f8f9fa' }}>
-                      <h5 className="mb-0">Tổng cộng:</h5>
-                      <h4 className="mb-0 text-danger fw-bold">{totalAmount.toLocaleString()}₫</h4>
-                    </div>
-                  </div>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '14px', color: '#1e293b' }}>{opt.label}</div>
+                        <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>{opt.sub}</div>
+                      </div>
+                      {form.phuongThucThanhToan === opt.value && (
+                        <i className="fas fa-check-circle" style={{ color: opt.color, marginLeft: 'auto', fontSize: '18px' }} />
+                      )}
+                    </label>
+                  ))}
+                </div>
+              </div>
 
-                  <div className="alert alert-info mt-3 mb-0" role="alert">
-                    <i className="fas fa-info-circle me-2"></i>
-                    <small>Đơn hàng sẽ được xử lý trong vòng 24h</small>
-                  </div>
-                </>
-              ) : (
-                <p className="text-center text-muted">Giỏ hàng trống</p>
-              )}
-            </div>
+              {/* Tóm tắt đơn hàng */}
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+                  borderRadius: '12px', padding: '16px 20px',
+                  marginBottom: '24px',
+                  border: '1px solid #bae6fd',
+                }}
+              >
+                <div style={{ fontWeight: 700, color: '#0369a1', marginBottom: '10px', fontSize: '14px' }}>
+                  <i className="fas fa-receipt me-2" />Tóm tắt đơn hàng
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#64748b', marginBottom: '6px' }}>
+                  <span>Tạm tính ({cartItems.length} sản phẩm)</span>
+                  <span>{fmt(totalAmount)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#64748b', marginBottom: '10px' }}>
+                  <span>Phí vận chuyển</span>
+                  <span style={{ color: '#22c55e', fontWeight: 600 }}>Miễn phí</span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex', justifyContent: 'space-between',
+                    paddingTop: '10px', borderTop: '1px solid #bae6fd',
+                  }}
+                >
+                  <span style={{ fontWeight: 700, color: '#1e293b', fontSize: '15px' }}>Tổng thanh toán</span>
+                  <span style={{ fontWeight: 800, color: '#0ea5e9', fontSize: '20px' }}>{fmt(totalAmount)}</span>
+                </div>
+              </div>
+
+              {/* Nút submit */}
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowDialog(false)}
+                  style={{
+                    flex: 1, padding: '13px',
+                    background: 'white', color: '#64748b',
+                    border: '1.5px solid #e5e7eb', borderRadius: '10px',
+                    fontWeight: 600, cursor: 'pointer', fontSize: '14px',
+                  }}
+                >
+                  <i className="fas fa-arrow-left me-2" />Quay lại
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  style={{
+                    flex: 2, padding: '13px',
+                    background: submitting
+                      ? '#94a3b8'
+                      : 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+                    color: 'white', border: 'none', borderRadius: '10px',
+                    fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer',
+                    fontSize: '15px',
+                    boxShadow: submitting ? 'none' : '0 4px 12px rgba(14,165,233,0.35)',
+                  }}
+                >
+                  {submitting ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" />
+                      Đang xử lý...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-check-circle me-2" />
+                      Xác nhận đặt hàng
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

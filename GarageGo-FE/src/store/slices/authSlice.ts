@@ -21,11 +21,14 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    loginStart: (state) => {
+    loginStart: state => {
       state.isLoading = true;
       state.error = null;
     },
-    loginSuccess: (state, action: PayloadAction<{ user: User; token: string }>) => {
+    loginSuccess: (
+      state,
+      action: PayloadAction<{ user: User; token: string }>
+    ) => {
       state.isLoading = false;
       state.user = action.payload.user;
       state.token = action.payload.token;
@@ -43,7 +46,7 @@ const authSlice = createSlice({
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     },
-    logout: (state) => {
+    logout: state => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
@@ -52,20 +55,41 @@ const authSlice = createSlice({
       localStorage.removeItem('user');
       localStorage.removeItem('cart'); // Clear cart on logout
     },
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
-    loadUserFromStorage: (state) => {
+    loadUserFromStorage: state => {
       const token = localStorage.getItem('token');
       const userStr = localStorage.getItem('user');
-      
+
       if (token && userStr) {
         try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          const isExpired = payload.exp * 1000 < Date.now();
+
+          if (isExpired) {
+            // Token expired nhưng vẫn load user vào state
+            // api.ts interceptor sẽ tự refresh khi gọi API
+            // Nếu không có refreshToken thì sẽ logout
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              return;
+            }
+            // Giữ user trong state, token sẽ được refresh khi gọi API đầu tiên
+            const user = JSON.parse(userStr);
+            state.user = user;
+            state.token = token; // token cũ, sẽ bị replace sau khi refresh
+            state.isAuthenticated = true;
+            return;
+          }
+
           const user = JSON.parse(userStr);
           state.user = user;
           state.token = token;
           state.isAuthenticated = true;
-        } catch (error) {
+        } catch {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
         }

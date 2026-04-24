@@ -14,16 +14,16 @@ export const AdminLayout: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
       <AdminSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
-      
+
       {/* Main Content */}
-      <div 
+      <div
         className={`transition-all duration-300 ${
           sidebarOpen ? 'lg:ml-64' : 'lg:ml-16'
         }`}
       >
         {/* Header */}
         <AdminHeader onToggleSidebar={toggleSidebar} />
-        
+
         {/* Page Content */}
         <main className="p-6">
           <Outlet />

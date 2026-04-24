@@ -13,11 +13,11 @@ interface SimpleChartProps {
   showValues?: boolean;
 }
 
-export const SimpleChart: React.FC<SimpleChartProps> = ({ 
-  data, 
-  type = 'bar', 
+export const SimpleChart: React.FC<SimpleChartProps> = ({
+  data,
+  type = 'bar',
   height = 200,
-  showValues = false 
+  showValues = false,
 }) => {
   const maxValue = Math.max(...data.map(item => item.value));
 
@@ -27,7 +27,7 @@ export const SimpleChart: React.FC<SimpleChartProps> = ({
         {data.map((item, index) => {
           const barHeight = maxValue > 0 ? (item.value / maxValue) * 100 : 0;
           const color = item.color || '#3b82f6';
-          
+
           return (
             <div key={index} className="flex flex-col items-center flex-1">
               {showValues && (
@@ -37,10 +37,10 @@ export const SimpleChart: React.FC<SimpleChartProps> = ({
               )}
               <div
                 className="w-full rounded-t-lg hover:opacity-80 transition-all cursor-pointer"
-                style={{ 
-                  height: `${barHeight}%`, 
+                style={{
+                  height: `${barHeight}%`,
                   minHeight: '8px',
-                  backgroundColor: color
+                  backgroundColor: color,
                 }}
                 title={`${item.label}: ${item.value.toLocaleString()}`}
               ></div>
@@ -57,7 +57,7 @@ export const SimpleChart: React.FC<SimpleChartProps> = ({
   if (type === 'pie') {
     const total = data.reduce((sum, item) => sum + item.value, 0);
     let currentAngle = 0;
-    
+
     return (
       <div className="flex items-center justify-center" style={{ height }}>
         <div className="relative">
@@ -69,10 +69,10 @@ export const SimpleChart: React.FC<SimpleChartProps> = ({
               const circumference = 2 * Math.PI * radius;
               const strokeDasharray = `${(percentage / 100) * circumference} ${circumference}`;
               const strokeDashoffset = -((currentAngle / 360) * circumference);
-              
+
               const color = item.color || `hsl(${index * 60}, 70%, 50%)`;
               currentAngle += angle;
-              
+
               return (
                 <circle
                   key={index}
@@ -93,7 +93,9 @@ export const SimpleChart: React.FC<SimpleChartProps> = ({
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
-              <div className="text-lg font-bold text-gray-800">{total.toLocaleString()}</div>
+              <div className="text-lg font-bold text-gray-800">
+                {total.toLocaleString()}
+              </div>
               <div className="text-xs text-gray-500">Tổng</div>
             </div>
           </div>
@@ -102,15 +104,16 @@ export const SimpleChart: React.FC<SimpleChartProps> = ({
           {data.map((item, index) => {
             const percentage = (item.value / total) * 100;
             const color = item.color || `hsl(${index * 60}, 70%, 50%)`;
-            
+
             return (
               <div key={index} className="flex items-center text-sm">
-                <div 
+                <div
                   className="w-3 h-3 rounded-full mr-2"
                   style={{ backgroundColor: color }}
                 ></div>
                 <span className="text-gray-700">
-                  {item.label}: {item.value.toLocaleString()} ({percentage.toFixed(1)}%)
+                  {item.label}: {item.value.toLocaleString()} (
+                  {percentage.toFixed(1)}%)
                 </span>
               </div>
             );
@@ -122,11 +125,13 @@ export const SimpleChart: React.FC<SimpleChartProps> = ({
 
   // Line chart (simple implementation)
   if (type === 'line') {
-    const points = data.map((item, index) => {
-      const x = (index / (data.length - 1)) * 300;
-      const y = height - (item.value / maxValue) * (height - 40);
-      return `${x},${y}`;
-    }).join(' ');
+    const points = data
+      .map((item, index) => {
+        const x = (index / (data.length - 1)) * 300;
+        const y = height - (item.value / maxValue) * (height - 40);
+        return `${x},${y}`;
+      })
+      .join(' ');
 
     return (
       <div style={{ height }}>
@@ -141,7 +146,7 @@ export const SimpleChart: React.FC<SimpleChartProps> = ({
           {data.map((item, index) => {
             const x = (index / (data.length - 1)) * 300;
             const y = height - (item.value / maxValue) * (height - 40);
-            
+
             return (
               <g key={index}>
                 <circle

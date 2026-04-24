@@ -56,7 +56,11 @@ export function DataTable<T extends Record<string, any>>({
 
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+    if (
+      sortConfig &&
+      sortConfig.key === key &&
+      sortConfig.direction === 'asc'
+    ) {
       direction = 'desc';
     }
     setSortConfig({ key, direction });
@@ -100,7 +104,7 @@ export function DataTable<T extends Record<string, any>>({
           >
             <span>‹</span>
           </button>
-          
+
           <div className="flex items-center space-x-1">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let pageNumber: number;
@@ -144,17 +148,24 @@ export function DataTable<T extends Record<string, any>>({
   };
 
   return (
-    <div className={cn('bg-white rounded-xl shadow-soft border border-secondary-100', className)}>
+    <div
+      className={cn(
+        'bg-white rounded-xl shadow-soft border border-secondary-100',
+        className
+      )}
+    >
       {/* Header */}
       {searchable && (
         <div className="p-6 border-b border-secondary-200">
           <div className="relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400">🔍</span>
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400">
+              🔍
+            </span>
             <input
               type="text"
               placeholder={searchPlaceholder}
               value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={e => handleSearch(e.target.value)}
               className="pl-10 pr-4 py-2 w-full max-w-sm border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
@@ -175,7 +186,9 @@ export function DataTable<T extends Record<string, any>>({
                     column.className
                   )}
                   style={{ width: column.width }}
-                  onClick={() => column.sortable && handleSort(column.key as string)}
+                  onClick={() =>
+                    column.sortable && handleSort(column.key as string)
+                  }
                 >
                   <div className="flex items-center space-x-1">
                     <span>{column.title}</span>
@@ -197,7 +210,10 @@ export function DataTable<T extends Record<string, any>>({
           <tbody className="divide-y divide-secondary-200">
             {loading ? (
               <tr>
-                <td colSpan={columns.length + (actions ? 1 : 0)} className="px-6 py-12 text-center">
+                <td
+                  colSpan={columns.length + (actions ? 1 : 0)}
+                  className="px-6 py-12 text-center"
+                >
                   <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
                     <span className="ml-2 text-secondary-600">Đang tải...</span>
@@ -206,7 +222,10 @@ export function DataTable<T extends Record<string, any>>({
               </tr>
             ) : sortedData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + (actions ? 1 : 0)} className="px-6 py-12 text-center text-secondary-600">
+                <td
+                  colSpan={columns.length + (actions ? 1 : 0)}
+                  className="px-6 py-12 text-center text-secondary-600"
+                >
                   {emptyText}
                 </td>
               </tr>
@@ -214,9 +233,16 @@ export function DataTable<T extends Record<string, any>>({
               sortedData.map((record, index) => (
                 <tr key={index} className="hover:bg-secondary-50">
                   {columns.map((column, colIndex) => (
-                    <td key={colIndex} className="px-6 py-4 whitespace-nowrap text-sm text-secondary-900">
+                    <td
+                      key={colIndex}
+                      className="px-6 py-4 whitespace-nowrap text-sm text-secondary-900"
+                    >
                       {column.render
-                        ? column.render(record[column.key as keyof T], record, index)
+                        ? column.render(
+                            record[column.key as keyof T],
+                            record,
+                            index
+                          )
                         : String(record[column.key as keyof T] || '')}
                     </td>
                   ))}

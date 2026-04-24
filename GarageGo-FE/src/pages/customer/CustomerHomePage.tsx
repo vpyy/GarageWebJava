@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../../store/slices/cartSlice';
 
@@ -25,11 +25,9 @@ interface Product {
 }
 
 export const CustomerHomePage: React.FC = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [services, setServices] = useState<Service[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentServicePage, setCurrentServicePage] = useState(1);
   const [currentProductPage, setCurrentProductPage] = useState(1);
@@ -44,35 +42,35 @@ export const CustomerHomePage: React.FC = () => {
   const fetchData = async () => {
     try {
       // Fetch services
-      const servicesResponse = await fetch('http://localhost:5102/api/DichVu');
+      const servicesResponse = await fetch('/api/dich-vu');
       if (servicesResponse.ok) {
         const servicesData = await servicesResponse.json();
-        setServices(servicesData); // Load all services for pagination
+        setServices(servicesData);
       }
 
       // Fetch products
-      const productsResponse = await fetch('http://localhost:5102/api/SanPham');
+      const productsResponse = await fetch('/api/san-pham');
       if (productsResponse.ok) {
         const productsData = await productsResponse.json();
-        setProducts(productsData); // Load all products for pagination
+        setProducts(productsData);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleAddToCart = (product: Product) => {
-    dispatch(addToCart({
-      id: product.maSP,
-      name: product.tenSP,
-      price: product.donGia,
-      quantity: 1,
-      image: product.hinhAnh,
-      stock: product.soLuongTon,
-      isAuthenticated: true
-    }));
+    dispatch(
+      addToCart({
+        id: product.maSP,
+        name: product.tenSP,
+        price: product.donGia,
+        quantity: 1,
+        image: product.hinhAnh,
+        stock: product.soLuongTon,
+        isAuthenticated: true,
+      })
+    );
     alert('Đã thêm sản phẩm vào giỏ hàng!');
   };
 
@@ -83,9 +81,19 @@ export const CustomerHomePage: React.FC = () => {
       title: 'GarageGo',
       subtitle: 'Dịch vụ sửa chữa & bảo dưỡng ô tô chuyên nghiệp hàng đầu',
       buttons: [
-        { text: 'Khám phá dịch vụ', icon: 'fas fa-tools', link: '#services', type: 'primary' },
-        { text: 'Xem sản phẩm', icon: 'fas fa-shopping-bag', link: '/customer/products', type: 'outline' }
-      ]
+        {
+          text: 'Khám phá dịch vụ',
+          icon: 'fas fa-tools',
+          link: '#services',
+          type: 'primary',
+        },
+        {
+          text: 'Xem sản phẩm',
+          icon: 'fas fa-shopping-bag',
+          link: '/customer/products',
+          type: 'outline',
+        },
+      ],
     },
     {
       bg: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=1920',
@@ -93,9 +101,19 @@ export const CustomerHomePage: React.FC = () => {
       title: 'Đội ngũ chuyên nghiệp',
       subtitle: 'Kỹ thuật viên giàu kinh nghiệm, trang thiết bị hiện đại',
       buttons: [
-        { text: 'Đặt lịch ngay', icon: 'fas fa-calendar-check', link: '/customer/services', type: 'primary' },
-        { text: 'Liên hệ tư vấn', icon: 'fas fa-phone', link: '/customer/contact', type: 'outline' }
-      ]
+        {
+          text: 'Đặt lịch ngay',
+          icon: 'fas fa-calendar-check',
+          link: '/customer/services',
+          type: 'primary',
+        },
+        {
+          text: 'Liên hệ tư vấn',
+          icon: 'fas fa-phone',
+          link: '/customer/contact',
+          type: 'outline',
+        },
+      ],
     },
     {
       bg: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1920',
@@ -103,10 +121,20 @@ export const CustomerHomePage: React.FC = () => {
       title: 'Phụ tùng chính hãng',
       subtitle: '100% phụ tùng chính hãng, giá cả cạnh tranh, bảo hành dài hạn',
       buttons: [
-        { text: 'Mua sắm ngay', icon: 'fas fa-shopping-cart', link: '/customer/products', type: 'primary' },
-        { text: 'Tìm hiểu thêm', icon: 'fas fa-info-circle', link: '#about', type: 'outline' }
-      ]
-    }
+        {
+          text: 'Mua sắm ngay',
+          icon: 'fas fa-shopping-cart',
+          link: '/customer/products',
+          type: 'primary',
+        },
+        {
+          text: 'Tìm hiểu thêm',
+          icon: 'fas fa-info-circle',
+          link: '#about',
+          type: 'outline',
+        },
+      ],
+    },
   ];
 
   let slideInterval: NodeJS.Timeout;
@@ -116,11 +144,11 @@ export const CustomerHomePage: React.FC = () => {
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    setCurrentSlide(prev => (prev + 1) % slides.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length);
   };
 
   const startSlider = () => {
@@ -145,7 +173,9 @@ export const CustomerHomePage: React.FC = () => {
 
   const handleServicePageChange = (page: number) => {
     setCurrentServicePage(page);
-    document.getElementById('services-list')?.scrollIntoView({ behavior: 'smooth' });
+    document
+      .getElementById('services-list')
+      ?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleProductPageChange = (page: number) => {
@@ -999,26 +1029,44 @@ export const CustomerHomePage: React.FC = () => {
             </div>
           ))}
         </div>
-        
+
         {/* Slider Navigation */}
-        <button className="slider-nav prev" onClick={() => { stopSlider(); prevSlide(); startSlider(); }}>
+        <button
+          className="slider-nav prev"
+          onClick={() => {
+            stopSlider();
+            prevSlide();
+            startSlider();
+          }}
+        >
           <i className="fas fa-chevron-left"></i>
         </button>
-        <button className="slider-nav next" onClick={() => { stopSlider(); nextSlide(); startSlider(); }}>
+        <button
+          className="slider-nav next"
+          onClick={() => {
+            stopSlider();
+            nextSlide();
+            startSlider();
+          }}
+        >
           <i className="fas fa-chevron-right"></i>
         </button>
-        
+
         {/* Slider Dots */}
         <div className="slider-dots">
           {slides.map((_, index) => (
             <span
               key={index}
               className={`dot ${index === currentSlide ? 'active' : ''}`}
-              onClick={() => { stopSlider(); showSlide(index); startSlider(); }}
+              onClick={() => {
+                stopSlider();
+                showSlide(index);
+                startSlider();
+              }}
             ></span>
           ))}
         </div>
-        
+
         {/* Scroll Indicator */}
         <div className="scroll-indicator">
           <span>Cuộn xuống</span>
@@ -1032,7 +1080,10 @@ export const CustomerHomePage: React.FC = () => {
           <div className="row align-items-center">
             <div className="col-lg-6">
               <div className="featured-car-image">
-                <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800" alt="Featured Car" />
+                <img
+                  src="https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800"
+                  alt="Featured Car"
+                />
                 <div className="car-badge">
                   <span className="year">2024</span>
                   <span className="model">ZK16</span>
@@ -1042,8 +1093,15 @@ export const CustomerHomePage: React.FC = () => {
             <div className="col-lg-6">
               <div className="featured-car-info">
                 <h2 className="section-label">VỀ CHÚNG TÔI</h2>
-                <h3 className="featured-title">GarageGo - Đối tác tin cậy cho xe của bạn</h3>
-                <p className="featured-desc">Với hơn 10 năm kinh nghiệm trong ngành, GarageGo tự hào là địa chỉ uy tín hàng đầu trong lĩnh vực sửa chữa và bảo dưỡng ô tô. Chúng tôi cam kết mang đến dịch vụ chất lượng cao nhất với giá cả hợp lý.</p>
+                <h3 className="featured-title">
+                  GarageGo - Đối tác tin cậy cho xe của bạn
+                </h3>
+                <p className="featured-desc">
+                  Với hơn 10 năm kinh nghiệm trong ngành, GarageGo tự hào là địa
+                  chỉ uy tín hàng đầu trong lĩnh vực sửa chữa và bảo dưỡng ô tô.
+                  Chúng tôi cam kết mang đến dịch vụ chất lượng cao nhất với giá
+                  cả hợp lý.
+                </p>
                 <div className="car-specs">
                   <div className="spec-item">
                     <i className="fas fa-tachometer-alt"></i>
@@ -1075,8 +1133,12 @@ export const CustomerHomePage: React.FC = () => {
                   </div>
                 </div>
                 <div className="featured-buttons">
-                  <Link to="/customer/contact" className="btn-luxury primary">Liên hệ ngay</Link>
-                  <Link to="/customer/services" className="btn-luxury dark">Xem dịch vụ</Link>
+                  <Link to="/customer/contact" className="btn-luxury primary">
+                    Liên hệ ngay
+                  </Link>
+                  <Link to="/customer/services" className="btn-luxury dark">
+                    Xem dịch vụ
+                  </Link>
                 </div>
               </div>
             </div>
@@ -1090,7 +1152,10 @@ export const CustomerHomePage: React.FC = () => {
           <div className="section-header">
             <h2 className="section-label">DỊCH VỤ CỦA CHÚNG TÔI</h2>
             <h3 className="section-title">Dịch vụ chuyên nghiệp</h3>
-            <p className="section-desc">Chúng tôi cung cấp đầy đủ các dịch vụ sửa chữa và bảo dưỡng ô tô với chất lượng cao nhất</p>
+            <p className="section-desc">
+              Chúng tôi cung cấp đầy đủ các dịch vụ sửa chữa và bảo dưỡng ô tô
+              với chất lượng cao nhất
+            </p>
           </div>
           <div className="services-grid">
             <div className="service-luxury-card">
@@ -1098,16 +1163,24 @@ export const CustomerHomePage: React.FC = () => {
                 <i className="fas fa-oil-can"></i>
               </div>
               <h4>Thay dầu & Bảo dưỡng</h4>
-              <p>Dịch vụ thay dầu định kỳ và bảo dưỡng toàn diện cho xe của bạn</p>
-              <Link to="/customer/services" className="service-link">Tìm hiểu thêm <i className="fas fa-arrow-right"></i></Link>
+              <p>
+                Dịch vụ thay dầu định kỳ và bảo dưỡng toàn diện cho xe của bạn
+              </p>
+              <Link to="/customer/services" className="service-link">
+                Tìm hiểu thêm <i className="fas fa-arrow-right"></i>
+              </Link>
             </div>
             <div className="service-luxury-card">
               <div className="service-icon">
                 <i className="fas fa-cogs"></i>
               </div>
               <h4>Sửa chữa động cơ</h4>
-              <p>Chẩn đoán và sửa chữa các vấn đề động cơ với thiết bị hiện đại</p>
-              <Link to="/customer/services" className="service-link">Tìm hiểu thêm <i className="fas fa-arrow-right"></i></Link>
+              <p>
+                Chẩn đoán và sửa chữa các vấn đề động cơ với thiết bị hiện đại
+              </p>
+              <Link to="/customer/services" className="service-link">
+                Tìm hiểu thêm <i className="fas fa-arrow-right"></i>
+              </Link>
             </div>
             <div className="service-luxury-card">
               <div className="service-icon">
@@ -1115,7 +1188,9 @@ export const CustomerHomePage: React.FC = () => {
               </div>
               <h4>Sửa chữa thân vỏ</h4>
               <p>Phục hồi và sửa chữa thân vỏ xe sau va chạm, tai nạn</p>
-              <Link to="/customer/services" className="service-link">Tìm hiểu thêm <i className="fas fa-arrow-right"></i></Link>
+              <Link to="/customer/services" className="service-link">
+                Tìm hiểu thêm <i className="fas fa-arrow-right"></i>
+              </Link>
             </div>
             <div className="service-luxury-card">
               <div className="service-icon">
@@ -1123,7 +1198,9 @@ export const CustomerHomePage: React.FC = () => {
               </div>
               <h4>Sơn xe chuyên nghiệp</h4>
               <p>Dịch vụ sơn xe với công nghệ tiên tiến, màu sắc chuẩn xác</p>
-              <Link to="/customer/services" className="service-link">Tìm hiểu thêm <i className="fas fa-arrow-right"></i></Link>
+              <Link to="/customer/services" className="service-link">
+                Tìm hiểu thêm <i className="fas fa-arrow-right"></i>
+              </Link>
             </div>
             <div className="service-luxury-card">
               <div className="service-icon">
@@ -1131,7 +1208,9 @@ export const CustomerHomePage: React.FC = () => {
               </div>
               <h4>Điều hòa & Điện lạnh</h4>
               <p>Bảo trì và sửa chữa hệ thống điều hòa, điện lạnh ô tô</p>
-              <Link to="/customer/services" className="service-link">Tìm hiểu thêm <i className="fas fa-arrow-right"></i></Link>
+              <Link to="/customer/services" className="service-link">
+                Tìm hiểu thêm <i className="fas fa-arrow-right"></i>
+              </Link>
             </div>
             <div className="service-luxury-card">
               <div className="service-icon">
@@ -1139,7 +1218,9 @@ export const CustomerHomePage: React.FC = () => {
               </div>
               <h4>Lốp & Phanh</h4>
               <p>Kiểm tra, thay thế lốp xe và hệ thống phanh an toàn</p>
-              <Link to="/customer/services" className="service-link">Tìm hiểu thêm <i className="fas fa-arrow-right"></i></Link>
+              <Link to="/customer/services" className="service-link">
+                Tìm hiểu thêm <i className="fas fa-arrow-right"></i>
+              </Link>
             </div>
           </div>
         </div>
@@ -1151,7 +1232,10 @@ export const CustomerHomePage: React.FC = () => {
           <div className="contact-header">
             <h2 className="section-label">LIÊN HỆ VỚI CHÚNG TÔI</h2>
             <h3 className="section-title">Bạn cần hỗ trợ?</h3>
-            <p className="section-desc">Đội ngũ tư vấn viên của chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7. Hãy liên hệ ngay để được tư vấn miễn phí!</p>
+            <p className="section-desc">
+              Đội ngũ tư vấn viên của chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7.
+              Hãy liên hệ ngay để được tư vấn miễn phí!
+            </p>
           </div>
           <div className="contact-grid">
             <div className="contact-card">
@@ -1180,7 +1264,11 @@ export const CustomerHomePage: React.FC = () => {
                 <i className="fas fa-clock"></i>
               </div>
               <h4>Giờ làm việc</h4>
-              <p>7:00 - 18:00<br/>(Thứ 2 - Chủ nhật)</p>
+              <p>
+                7:00 - 18:00
+                <br />
+                (Thứ 2 - Chủ nhật)
+              </p>
             </div>
           </div>
         </div>
@@ -1192,15 +1280,21 @@ export const CustomerHomePage: React.FC = () => {
           <div className="section-header">
             <h2 className="section-label">SẢN PHẨM NỔI BẬT</h2>
             <h3 className="section-title">Phụ tùng chính hãng</h3>
-            <p className="section-desc">Phụ tùng và phụ kiện ô tô chính hãng, chất lượng cao với giá cả cạnh tranh</p>
+            <p className="section-desc">
+              Phụ tùng và phụ kiện ô tô chính hãng, chất lượng cao với giá cả
+              cạnh tranh
+            </p>
           </div>
           <div className="products-grid">
-            {currentProducts.map((product) => (
+            {currentProducts.map(product => (
               <div key={product.maSP} className="product-luxury-card">
                 <div className="product-image">
-                  <img 
-                    src={product.hinhAnh || "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400"} 
-                    alt={product.tenSP} 
+                  <img
+                    src={
+                      product.hinhAnh ||
+                      'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400'
+                    }
+                    alt={product.tenSP}
                   />
                   {product.soLuongTon > 0 ? (
                     <span className="product-badge in-stock">
@@ -1212,15 +1306,15 @@ export const CustomerHomePage: React.FC = () => {
                     </span>
                   )}
                   <div className="product-overlay">
-                    <button 
-                      className="quick-view" 
+                    <button
+                      className="quick-view"
                       onClick={() => handleAddToCart(product)}
                       disabled={(product.soLuongTon || 0) <= 0}
                     >
                       <i className="fas fa-cart-plus"></i>
                     </button>
-                    <Link 
-                      to={`/customer/products/${product.maSP}`} 
+                    <Link
+                      to={`/customer/products/${product.maSP}`}
                       className="quick-view"
                     >
                       <i className="fas fa-eye"></i>
@@ -1231,10 +1325,12 @@ export const CustomerHomePage: React.FC = () => {
                   <h4>{product.tenSP}</h4>
                   <p>{product.moTa}</p>
                   <div className="product-footer">
-                    <span className="price">{product.donGia.toLocaleString()} ₫</span>
+                    <span className="price">
+                      {product.donGia.toLocaleString()} ₫
+                    </span>
                     {product.soLuongTon > 0 && (
-                      <button 
-                        className="btn-add-cart" 
+                      <button
+                        className="btn-add-cart"
                         onClick={() => handleAddToCart(product)}
                       >
                         <i className="fas fa-shopping-cart"></i> Thêm
@@ -1245,7 +1341,7 @@ export const CustomerHomePage: React.FC = () => {
               </div>
             ))}
           </div>
-          
+
           {/* Products Pagination */}
           {totalProductPages > 1 && (
             <div className="pagination-container">
@@ -1256,17 +1352,19 @@ export const CustomerHomePage: React.FC = () => {
               >
                 <i className="fas fa-chevron-left"></i>
               </button>
-              
-              {Array.from({ length: totalProductPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  className={`pagination-btn ${page === currentProductPage ? 'active' : ''}`}
-                  onClick={() => handleProductPageChange(page)}
-                >
-                  {page}
-                </button>
-              ))}
-              
+
+              {Array.from({ length: totalProductPages }, (_, i) => i + 1).map(
+                page => (
+                  <button
+                    key={page}
+                    className={`pagination-btn ${page === currentProductPage ? 'active' : ''}`}
+                    onClick={() => handleProductPageChange(page)}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
               <button
                 className="pagination-btn"
                 onClick={() => handleProductPageChange(currentProductPage + 1)}
@@ -1276,7 +1374,7 @@ export const CustomerHomePage: React.FC = () => {
               </button>
             </div>
           )}
-          
+
           <div className="text-center mt-5">
             <Link to="/customer/products" className="btn-luxury primary">
               Xem tất cả sản phẩm <i className="fas fa-arrow-right ms-2"></i>
@@ -1292,15 +1390,23 @@ export const CustomerHomePage: React.FC = () => {
             <div className="section-header">
               <h2 className="section-label">DỊCH VỤ HIỆN CÓ</h2>
               <h3 className="section-title">Đặt lịch dịch vụ</h3>
-              <p className="section-desc">Chọn dịch vụ phù hợp và đặt lịch ngay hôm nay</p>
+              <p className="section-desc">
+                Chọn dịch vụ phù hợp và đặt lịch ngay hôm nay
+              </p>
             </div>
             <div className="services-list-grid">
-              {currentServices.map((service) => (
-                <div key={service.maDV || service.id} className="service-list-card">
+              {currentServices.map(service => (
+                <div
+                  key={service.maDV || service.id}
+                  className="service-list-card"
+                >
                   <div className="service-list-image">
-                    <img 
-                      src={service.hinhAnh || "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400"} 
-                      alt={service.tenDV || service.tenDichVu} 
+                    <img
+                      src={
+                        service.hinhAnh ||
+                        'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400'
+                      }
+                      alt={service.tenDV || service.tenDichVu}
                     />
                     {service.trangThai && (
                       <span className="service-badge">
@@ -1312,9 +1418,12 @@ export const CustomerHomePage: React.FC = () => {
                     <h4>{service.tenDV || service.tenDichVu}</h4>
                     <p>{service.moTa}</p>
                     <div className="service-list-footer">
-                      <span className="price">{(service.donGia || service.gia || 0).toLocaleString()} ₫</span>
-                      <Link 
-                        to={`/customer/services/${service.maDV || service.id}/book`} 
+                      <span className="price">
+                        {(service.donGia || service.gia || 0).toLocaleString()}{' '}
+                        ₫
+                      </span>
+                      <Link
+                        to={`/customer/services/${service.maDV || service.id}/book`}
                         className="btn-book"
                       >
                         <i className="fas fa-calendar-check"></i> Đặt ngay
@@ -1324,38 +1433,44 @@ export const CustomerHomePage: React.FC = () => {
                 </div>
               ))}
             </div>
-            
+
             {/* Services Pagination */}
             {totalServicePages > 1 && (
               <div className="pagination-container">
                 <button
                   className="pagination-btn"
-                  onClick={() => handleServicePageChange(currentServicePage - 1)}
+                  onClick={() =>
+                    handleServicePageChange(currentServicePage - 1)
+                  }
                   disabled={currentServicePage === 1}
                 >
                   <i className="fas fa-chevron-left"></i>
                 </button>
-                
-                {Array.from({ length: totalServicePages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    className={`pagination-btn ${page === currentServicePage ? 'active' : ''}`}
-                    onClick={() => handleServicePageChange(page)}
-                  >
-                    {page}
-                  </button>
-                ))}
-                
+
+                {Array.from({ length: totalServicePages }, (_, i) => i + 1).map(
+                  page => (
+                    <button
+                      key={page}
+                      className={`pagination-btn ${page === currentServicePage ? 'active' : ''}`}
+                      onClick={() => handleServicePageChange(page)}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
+
                 <button
                   className="pagination-btn"
-                  onClick={() => handleServicePageChange(currentServicePage + 1)}
+                  onClick={() =>
+                    handleServicePageChange(currentServicePage + 1)
+                  }
                   disabled={currentServicePage === totalServicePages}
                 >
                   <i className="fas fa-chevron-right"></i>
                 </button>
               </div>
             )}
-            
+
             <div className="text-center mt-5">
               <Link to="/customer/services" className="btn-luxury primary">
                 Xem tất cả dịch vụ <i className="fas fa-arrow-right ms-2"></i>
@@ -1371,7 +1486,10 @@ export const CustomerHomePage: React.FC = () => {
         <div className="container">
           <div className="cta-content">
             <h2>Sẵn sàng trải nghiệm dịch vụ?</h2>
-            <p>Liên hệ ngay để được tư vấn miễn phí và nhận ưu đãi đặc biệt dành cho khách hàng mới</p>
+            <p>
+              Liên hệ ngay để được tư vấn miễn phí và nhận ưu đãi đặc biệt dành
+              cho khách hàng mới
+            </p>
             <div className="cta-buttons">
               <Link to="/customer/contact" className="btn-luxury light">
                 <i className="fas fa-phone-alt"></i> Liên hệ ngay

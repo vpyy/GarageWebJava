@@ -16,9 +16,11 @@ const navigationItems = [
 export const PublicHeader: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
   const { itemCount } = useSelector((state: RootState) => state.cart);
-  
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -48,7 +50,7 @@ export const PublicHeader: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            {navigationItems.map((item) => (
+            {navigationItems.map(item => (
               <NavLink
                 key={item.href}
                 to={item.href}
@@ -110,7 +112,9 @@ export const PublicHeader: React.FC = () => {
                         className="flex items-center space-x-3 w-full px-3 py-2 text-left rounded-lg hover:bg-secondary-50 transition-colors"
                       >
                         <span className="text-secondary-400">👤</span>
-                        <span className="text-sm text-secondary-700">Hồ sơ</span>
+                        <span className="text-sm text-secondary-700">
+                          Hồ sơ
+                        </span>
                       </Link>
                       <Link
                         to="/orders"
@@ -118,7 +122,9 @@ export const PublicHeader: React.FC = () => {
                         className="flex items-center space-x-3 w-full px-3 py-2 text-left rounded-lg hover:bg-secondary-50 transition-colors"
                       >
                         <span className="text-secondary-400">📦</span>
-                        <span className="text-sm text-secondary-700">Đơn hàng</span>
+                        <span className="text-sm text-secondary-700">
+                          Đơn hàng
+                        </span>
                       </Link>
                       <Link
                         to="/service-requests"
@@ -126,7 +132,9 @@ export const PublicHeader: React.FC = () => {
                         className="flex items-center space-x-3 w-full px-3 py-2 text-left rounded-lg hover:bg-secondary-50 transition-colors"
                       >
                         <span className="text-secondary-400">⚙️</span>
-                        <span className="text-sm text-secondary-700">Yêu cầu dịch vụ</span>
+                        <span className="text-sm text-secondary-700">
+                          Yêu cầu dịch vụ
+                        </span>
                       </Link>
                       <hr className="my-2 border-secondary-200" />
                       <button
@@ -162,7 +170,11 @@ export const PublicHeader: React.FC = () => {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden flex items-center justify-center w-10 h-10 text-secondary-600 hover:text-secondary-900 transition-colors"
             >
-              {mobileMenuOpen ? <span className="text-lg">✕</span> : <span className="text-lg">☰</span>}
+              {mobileMenuOpen ? (
+                <span className="text-lg">✕</span>
+              ) : (
+                <span className="text-lg">☰</span>
+              )}
             </button>
           </div>
         </div>
@@ -171,7 +183,7 @@ export const PublicHeader: React.FC = () => {
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-secondary-200 py-4">
             <nav className="space-y-2">
-              {navigationItems.map((item) => (
+              {navigationItems.map(item => (
                 <NavLink
                   key={item.href}
                   to={item.href}

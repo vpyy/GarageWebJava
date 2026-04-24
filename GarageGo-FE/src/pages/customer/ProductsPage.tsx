@@ -39,12 +39,9 @@ export const ProductsPage: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      console.log('Fetching products from:', 'http://localhost:5102/api/SanPham');
-      const response = await fetch('http://localhost:5102/api/SanPham');
-      console.log('Response status:', response.status);
+      const response = await fetch('/api/san-pham');
       if (response.ok) {
         const data = await response.json();
-        console.log('Products data:', data);
         setProducts(data);
       } else {
         console.error('Response not ok:', response.status, response.statusText);
@@ -56,9 +53,10 @@ export const ProductsPage: React.FC = () => {
     }
   };
 
-  const filteredProducts = products.filter(product =>
-    product.tenSP.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.moTa.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = products.filter(
+    product =>
+      product.tenSP.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.moTa.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination logic
@@ -84,16 +82,18 @@ export const ProductsPage: React.FC = () => {
       return;
     }
 
-    dispatch(addToCart({
-      id: product.maSP,
-      name: product.tenSP,
-      price: product.donGia,
-      quantity: 1,
-      image: product.hinhAnh,
-      stock: product.soLuongTon,
-      isAuthenticated
-    }));
-    
+    dispatch(
+      addToCart({
+        id: product.maSP,
+        name: product.tenSP,
+        price: product.donGia,
+        quantity: 1,
+        image: product.hinhAnh,
+        stock: product.soLuongTon,
+        isAuthenticated,
+      })
+    );
+
     if (!error) {
       toast.success('Đã thêm sản phẩm vào giỏ hàng!');
     }
@@ -101,7 +101,10 @@ export const ProductsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: '400px' }}
+      >
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Đang tải...</span>
         </div>
@@ -485,7 +488,7 @@ export const ProductsPage: React.FC = () => {
         <div className="container text-center">
           <h1>Sản phẩm chất lượng</h1>
           <p>Phụ tùng và phụ kiện ô tô chính hãng với giá cả cạnh tranh</p>
-          
+
           <div className="row justify-content-center mt-4">
             <div className="col-md-6">
               <input
@@ -548,7 +551,9 @@ export const ProductsPage: React.FC = () => {
             )}
             {!searchTerm && (
               <p className="text-center text-muted">
-                Hiển thị {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} trong tổng số {filteredProducts.length} sản phẩm
+                Hiển thị {startIndex + 1}-
+                {Math.min(endIndex, filteredProducts.length)} trong tổng số{' '}
+                {filteredProducts.length} sản phẩm
               </p>
             )}
           </div>
@@ -556,16 +561,20 @@ export const ProductsPage: React.FC = () => {
 
         <div className="products-grid">
           {currentProducts.length > 0 ? (
-            currentProducts.map((product) => (
+            currentProducts.map(product => (
               <div key={product.maSP} className="product-card">
                 <div style={{ position: 'relative' }}>
                   <img
-                    src={product.hinhAnh || "https://images.pexels.com/photos/3806288/pexels-photo-3806288.jpeg"}
+                    src={
+                      product.hinhAnh ||
+                      'https://images.pexels.com/photos/3806288/pexels-photo-3806288.jpeg'
+                    }
                     alt={product.tenSP}
                   />
                   {product.soLuongTon > 0 ? (
                     <span className="product-badge bg-success text-white">
-                      <i className="fas fa-check me-1"></i>Còn {product.soLuongTon}
+                      <i className="fas fa-check me-1"></i>Còn{' '}
+                      {product.soLuongTon}
                     </span>
                   ) : (
                     <span className="product-badge bg-warning text-white">
@@ -577,13 +586,19 @@ export const ProductsPage: React.FC = () => {
                       className="quick-view"
                       onClick={() => handleAddToCart(product)}
                       disabled={product.soLuongTon <= 0}
-                      title={isAuthenticated ? "Thêm vào giỏ hàng" : "Đăng nhập để thêm vào giỏ hàng"}
+                      title={
+                        isAuthenticated
+                          ? 'Thêm vào giỏ hàng'
+                          : 'Đăng nhập để thêm vào giỏ hàng'
+                      }
                     >
                       <i className="fas fa-cart-plus"></i>
                     </button>
                     <button
                       className="quick-view"
-                      onClick={() => navigate(`/customer/products/${product.maSP}`)}
+                      onClick={() =>
+                        navigate(`/customer/products/${product.maSP}`)
+                      }
                       title="Xem chi tiết"
                     >
                       <i className="fas fa-eye"></i>
@@ -593,9 +608,11 @@ export const ProductsPage: React.FC = () => {
                 <div className="card-body">
                   <h5>{product.tenSP}</h5>
                   <p className="description">{product.moTa}</p>
-                  
+
                   <div className="card-footer">
-                    <span className="price">{product.donGia.toLocaleString()}₫</span>
+                    <span className="price">
+                      {product.donGia.toLocaleString()}₫
+                    </span>
                     <div className="stock-info">
                       {product.soLuongTon > 0 ? (
                         <span className="text-success">
@@ -612,8 +629,18 @@ export const ProductsPage: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="col-12 text-center py-5" style={{ gridColumn: '1 / -1' }}>
-              <i className="fas fa-search" style={{ fontSize: '64px', color: '#94a3b8', marginBottom: '1rem' }}></i>
+            <div
+              className="col-12 text-center py-5"
+              style={{ gridColumn: '1 / -1' }}
+            >
+              <i
+                className="fas fa-search"
+                style={{
+                  fontSize: '64px',
+                  color: '#94a3b8',
+                  marginBottom: '1rem',
+                }}
+              ></i>
               <h4>Không tìm thấy sản phẩm</h4>
               <p className="text-muted">Thử tìm kiếm với từ khóa khác</p>
             </div>
@@ -630,8 +657,8 @@ export const ProductsPage: React.FC = () => {
             >
               <i className="fas fa-chevron-left"></i>
             </button>
-            
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
               <button
                 key={page}
                 className={`pagination-btn ${page === currentPage ? 'active' : ''}`}
@@ -640,7 +667,7 @@ export const ProductsPage: React.FC = () => {
                 {page}
               </button>
             ))}
-            
+
             <button
               className="pagination-btn"
               onClick={() => handlePageChange(currentPage + 1)}
@@ -658,7 +685,10 @@ export const ProductsPage: React.FC = () => {
           <div className="contact-header">
             <h2 className="section-label">LIÊN HỆ VỚI CHÚNG TÔI</h2>
             <h3 className="section-title">Cần tư vấn thêm?</h3>
-            <p className="section-desc">Đội ngũ tư vấn viên của chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7. Hãy liên hệ ngay để được tư vấn miễn phí!</p>
+            <p className="section-desc">
+              Đội ngũ tư vấn viên của chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7.
+              Hãy liên hệ ngay để được tư vấn miễn phí!
+            </p>
           </div>
           <div className="contact-grid">
             <div className="contact-card">

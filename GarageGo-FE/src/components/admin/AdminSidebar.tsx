@@ -19,11 +19,6 @@ const menuSections = [
         path: '/admin/dashboard',
       },
       {
-        title: 'Thống kê',
-        icon: 'fas fa-chart-line',
-        path: '/admin/statistics',
-      },
-      {
         title: 'Khách hàng',
         icon: 'fas fa-users',
         path: '/admin/customers',
@@ -33,18 +28,13 @@ const menuSections = [
         icon: 'fas fa-car',
         path: '/admin/vehicles',
       },
-    ]
+    ],
   },
   {
     title: 'Dịch vụ',
     items: [
       {
-        title: 'Dịch vụ',
-        icon: 'fas fa-tools',
-        path: '/admin/services',
-      },
-      {
-        title: 'Yêu cầu',
+        title: 'Yêu cầu dịch vụ',
         icon: 'fas fa-clipboard-list',
         path: '/admin/requests',
       },
@@ -53,11 +43,21 @@ const menuSections = [
         icon: 'fas fa-file-invoice-dollar',
         path: '/admin/invoices',
       },
-    ]
+      {
+        title: 'Liên hệ',
+        icon: 'fas fa-envelope',
+        path: '/admin/contacts',
+      },
+    ],
   },
   {
     title: 'Kho hàng',
     items: [
+      {
+        title: 'Dịch vụ',
+        icon: 'fas fa-tools',
+        path: '/admin/services',
+      },
       {
         title: 'Sản phẩm',
         icon: 'fas fa-box',
@@ -65,29 +65,27 @@ const menuSections = [
       },
       {
         title: 'Thống kê',
-        icon: 'fas fa-chart-bar',
-        path: '/admin/reports',
+        icon: 'fas fa-chart-line',
+        path: '/admin/statistics',
       },
-    ]
+    ],
   },
   {
     title: 'Cài đặt',
     items: [
       {
-        title: 'Liên hệ',
-        icon: 'fas fa-envelope',
-        path: '/admin/contacts',
-      },
-      {
         title: 'Cài đặt',
         icon: 'fas fa-cog',
         path: '/admin/settings',
       },
-    ]
-  }
+    ],
+  },
 ];
 
-export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
+export const AdminSidebar: React.FC<AdminSidebarProps> = ({
+  isOpen,
+  onToggle,
+}) => {
   const location = useLocation();
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -101,7 +99,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) 
         )}
         style={{
           background: 'linear-gradient(180deg, #2377FC 0%, #1B5EE6 100%)',
-          boxShadow: '4px 0 20px rgba(35, 119, 252, 0.15)'
+          boxShadow: '4px 0 20px rgba(35, 119, 252, 0.15)',
         }}
       >
         {/* Logo */}
@@ -121,7 +119,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) 
             onClick={onToggle}
             className="hidden lg:flex items-center justify-center w-8 h-8 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200"
           >
-            {isOpen ? <i className="fas fa-chevron-left text-sm"></i> : <i className="fas fa-chevron-right text-sm"></i>}
+            {isOpen ? (
+              <i className="fas fa-chevron-left text-sm"></i>
+            ) : (
+              <i className="fas fa-chevron-right text-sm"></i>
+            )}
           </button>
         </div>
 
@@ -145,7 +147,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) 
         )}
 
         {/* Navigation - Scrollable */}
-        <div className="flex-1 overflow-y-auto py-4" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.3) transparent' }}>
+        <div
+          className="flex-1 overflow-y-auto py-4"
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(255,255,255,0.3) transparent',
+          }}
+        >
           {menuSections.map((section, sectionIndex) => (
             <div key={sectionIndex} className="mb-6">
               {isOpen && (
@@ -158,7 +166,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) 
               <div className="space-y-1 px-2">
                 {section.items.map((item, itemIndex) => {
                   const isActive = location.pathname === item.path;
-                  
+
                   return (
                     <NavLink
                       key={itemIndex}
@@ -174,7 +182,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) 
                         <i className={cn(item.icon, 'text-base')}></i>
                       </div>
                       {isOpen && (
-                        <span className="ml-3 font-medium truncate">{item.title}</span>
+                        <span className="ml-3 font-medium truncate">
+                          {item.title}
+                        </span>
                       )}
                       {!isOpen && (
                         <div className="absolute left-16 bg-gray-900 text-white px-3 py-2 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 shadow-lg">
@@ -199,7 +209,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) 
         )}
         style={{
           background: 'linear-gradient(180deg, #2377FC 0%, #1B5EE6 100%)',
-          boxShadow: '4px 0 20px rgba(35, 119, 252, 0.15)'
+          boxShadow: '4px 0 20px rgba(35, 119, 252, 0.15)',
         }}
       >
         {/* Logo */}
@@ -239,7 +249,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) 
         </div>
 
         {/* Navigation - Scrollable */}
-        <div className="flex-1 overflow-y-auto py-4" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.3) transparent' }}>
+        <div
+          className="flex-1 overflow-y-auto py-4"
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(255,255,255,0.3) transparent',
+          }}
+        >
           {menuSections.map((section, sectionIndex) => (
             <div key={sectionIndex} className="mb-6">
               <div className="px-4 mb-3">
@@ -250,7 +266,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) 
               <div className="space-y-1 px-2">
                 {section.items.map((item, itemIndex) => {
                   const isActive = location.pathname === item.path;
-                  
+
                   return (
                     <NavLink
                       key={itemIndex}

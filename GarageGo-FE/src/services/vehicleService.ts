@@ -1,8 +1,12 @@
 import { apiService } from './api';
-import { Vehicle, VehicleCreateRequest, VehicleUpdateRequest } from '../types/vehicle';
+import {
+  Vehicle,
+  VehicleCreateRequest,
+  VehicleUpdateRequest,
+} from '../types/vehicle';
 
 class VehicleService {
-  private readonly baseUrl = '/Xe';
+  private readonly baseUrl = '/xe';
 
   async getAll(): Promise<Vehicle[]> {
     return apiService.get<Vehicle[]>(this.baseUrl);

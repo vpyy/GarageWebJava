@@ -16,7 +16,7 @@ export const VehicleManagement: React.FC = () => {
     hangXe: '',
     doiXe: new Date().getFullYear(),
     mauXe: '',
-    maKH: 0
+    maKH: 0,
   });
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export const VehicleManagement: React.FC = () => {
       setLoading(true);
       const [vehiclesData, customersData] = await Promise.all([
         vehicleService.getAll(),
-        customerService.getCustomers()
+        customerService.getCustomers(),
       ]);
       setVehicles(vehiclesData);
       setCustomers(customersData);
@@ -44,7 +44,10 @@ export const VehicleManagement: React.FC = () => {
     e.preventDefault();
     try {
       if (editingVehicle) {
-        await vehicleService.update(editingVehicle.maXe, { ...formData, maXe: editingVehicle.maXe });
+        await vehicleService.update(editingVehicle.maXe, {
+          ...formData,
+          maXe: editingVehicle.maXe,
+        });
         toast.success('Cập nhật xe thành công');
       } else {
         await vehicleService.create(formData);
@@ -66,7 +69,7 @@ export const VehicleManagement: React.FC = () => {
       hangXe: vehicle.hangXe || '',
       doiXe: vehicle.doiXe || new Date().getFullYear(),
       mauXe: vehicle.mauXe || '',
-      maKH: vehicle.maKH
+      maKH: vehicle.maKH,
     });
     setShowModal(true);
   };
@@ -89,7 +92,7 @@ export const VehicleManagement: React.FC = () => {
       hangXe: '',
       doiXe: new Date().getFullYear(),
       mauXe: '',
-      maKH: 0
+      maKH: 0,
     });
   };
 
@@ -145,7 +148,7 @@ export const VehicleManagement: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {vehicles.map((vehicle) => (
+            {vehicles.map(vehicle => (
               <tr key={vehicle.maXe}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {vehicle.bienSo}
@@ -198,7 +201,9 @@ export const VehicleManagement: React.FC = () => {
                   <input
                     type="text"
                     value={formData.bienSo}
-                    onChange={(e) => setFormData({ ...formData, bienSo: e.target.value })}
+                    onChange={e =>
+                      setFormData({ ...formData, bienSo: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -210,7 +215,9 @@ export const VehicleManagement: React.FC = () => {
                   <input
                     type="text"
                     value={formData.hangXe}
-                    onChange={(e) => setFormData({ ...formData, hangXe: e.target.value })}
+                    onChange={e =>
+                      setFormData({ ...formData, hangXe: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -221,7 +228,12 @@ export const VehicleManagement: React.FC = () => {
                   <input
                     type="number"
                     value={formData.doiXe}
-                    onChange={(e) => setFormData({ ...formData, doiXe: parseInt(e.target.value) })}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        doiXe: parseInt(e.target.value),
+                      })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -232,7 +244,9 @@ export const VehicleManagement: React.FC = () => {
                   <input
                     type="text"
                     value={formData.mauXe}
-                    onChange={(e) => setFormData({ ...formData, mauXe: e.target.value })}
+                    onChange={e =>
+                      setFormData({ ...formData, mauXe: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -242,12 +256,17 @@ export const VehicleManagement: React.FC = () => {
                   </label>
                   <select
                     value={formData.maKH}
-                    onChange={(e) => setFormData({ ...formData, maKH: parseInt(e.target.value) })}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        maKH: parseInt(e.target.value),
+                      })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   >
                     <option value={0}>Chọn khách hàng</option>
-                    {customers.map((customer) => (
+                    {customers.map(customer => (
                       <option key={customer.maKH} value={customer.maKH}>
                         {customer.tenKH} - {customer.sdt}
                       </option>

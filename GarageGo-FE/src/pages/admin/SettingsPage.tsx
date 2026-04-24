@@ -20,7 +20,7 @@ export const SettingsPage: React.FC = () => {
   const handleInputChange = (field: string, value: any) => {
     setSettings(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -35,7 +35,9 @@ export const SettingsPage: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Cài đặt hệ thống</h1>
-          <p className="text-gray-600">Quản lý cấu hình và thiết lập hệ thống</p>
+          <p className="text-gray-600">
+            Quản lý cấu hình và thiết lập hệ thống
+          </p>
         </div>
         <button
           onClick={handleSave}
@@ -53,7 +55,7 @@ export const SettingsPage: React.FC = () => {
             <i className="fas fa-cog mr-2 text-blue-600"></i>
             Cài đặt chung
           </h2>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -62,7 +64,7 @@ export const SettingsPage: React.FC = () => {
               <input
                 type="text"
                 value={settings.siteName}
-                onChange={(e) => handleInputChange('siteName', e.target.value)}
+                onChange={e => handleInputChange('siteName', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -73,7 +75,9 @@ export const SettingsPage: React.FC = () => {
               </label>
               <textarea
                 value={settings.siteDescription}
-                onChange={(e) => handleInputChange('siteDescription', e.target.value)}
+                onChange={e =>
+                  handleInputChange('siteDescription', e.target.value)
+                }
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -85,7 +89,7 @@ export const SettingsPage: React.FC = () => {
               </label>
               <select
                 value={settings.currency}
-                onChange={(e) => handleInputChange('currency', e.target.value)}
+                onChange={e => handleInputChange('currency', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="VND">VND - Việt Nam Đồng</option>
@@ -101,7 +105,9 @@ export const SettingsPage: React.FC = () => {
               <input
                 type="number"
                 value={settings.taxRate}
-                onChange={(e) => handleInputChange('taxRate', parseFloat(e.target.value))}
+                onChange={e =>
+                  handleInputChange('taxRate', parseFloat(e.target.value))
+                }
                 min="0"
                 max="100"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -116,7 +122,7 @@ export const SettingsPage: React.FC = () => {
             <i className="fas fa-address-book mr-2 text-green-600"></i>
             Thông tin liên hệ
           </h2>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -125,7 +131,9 @@ export const SettingsPage: React.FC = () => {
               <input
                 type="email"
                 value={settings.contactEmail}
-                onChange={(e) => handleInputChange('contactEmail', e.target.value)}
+                onChange={e =>
+                  handleInputChange('contactEmail', e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -137,7 +145,9 @@ export const SettingsPage: React.FC = () => {
               <input
                 type="tel"
                 value={settings.contactPhone}
-                onChange={(e) => handleInputChange('contactPhone', e.target.value)}
+                onChange={e =>
+                  handleInputChange('contactPhone', e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -148,7 +158,7 @@ export const SettingsPage: React.FC = () => {
               </label>
               <textarea
                 value={settings.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
+                onChange={e => handleInputChange('address', e.target.value)}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -161,7 +171,9 @@ export const SettingsPage: React.FC = () => {
               <input
                 type="text"
                 value={settings.workingHours}
-                onChange={(e) => handleInputChange('workingHours', e.target.value)}
+                onChange={e =>
+                  handleInputChange('workingHours', e.target.value)
+                }
                 placeholder="8:00 - 18:00"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -175,7 +187,7 @@ export const SettingsPage: React.FC = () => {
             <i className="fas fa-bell mr-2 text-yellow-600"></i>
             Cài đặt thông báo
           </h2>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -190,7 +202,9 @@ export const SettingsPage: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={settings.emailNotifications}
-                  onChange={(e) => handleInputChange('emailNotifications', e.target.checked)}
+                  onChange={e =>
+                    handleInputChange('emailNotifications', e.target.checked)
+                  }
                   className="sr-only peer"
                 />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -210,7 +224,9 @@ export const SettingsPage: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={settings.smsNotifications}
-                  onChange={(e) => handleInputChange('smsNotifications', e.target.checked)}
+                  onChange={e =>
+                    handleInputChange('smsNotifications', e.target.checked)
+                  }
                   className="sr-only peer"
                 />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -225,7 +241,7 @@ export const SettingsPage: React.FC = () => {
             <i className="fas fa-server mr-2 text-purple-600"></i>
             Cài đặt hệ thống
           </h2>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -240,7 +256,9 @@ export const SettingsPage: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={settings.autoBackup}
-                  onChange={(e) => handleInputChange('autoBackup', e.target.checked)}
+                  onChange={e =>
+                    handleInputChange('autoBackup', e.target.checked)
+                  }
                   className="sr-only peer"
                 />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
@@ -254,7 +272,9 @@ export const SettingsPage: React.FC = () => {
                 </label>
                 <select
                   value={settings.backupFrequency}
-                  onChange={(e) => handleInputChange('backupFrequency', e.target.value)}
+                  onChange={e =>
+                    handleInputChange('backupFrequency', e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="hourly">Mỗi giờ</option>
@@ -278,7 +298,9 @@ export const SettingsPage: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={settings.maintenanceMode}
-                  onChange={(e) => handleInputChange('maintenanceMode', e.target.checked)}
+                  onChange={e =>
+                    handleInputChange('maintenanceMode', e.target.checked)
+                  }
                   className="sr-only peer"
                 />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>

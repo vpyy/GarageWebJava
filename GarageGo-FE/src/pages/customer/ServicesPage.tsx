@@ -27,12 +27,9 @@ export const ServicesPage: React.FC = () => {
 
   const fetchServices = async () => {
     try {
-      console.log('Fetching services from:', 'http://localhost:5102/api/DichVu');
-      const response = await fetch('http://localhost:5102/api/DichVu');
-      console.log('Response status:', response.status);
+      const response = await fetch('/api/dich-vu');
       if (response.ok) {
         const data = await response.json();
-        console.log('Services data:', data);
         setServices(data);
       } else {
         console.error('Response not ok:', response.status, response.statusText);
@@ -44,9 +41,12 @@ export const ServicesPage: React.FC = () => {
     }
   };
 
-  const filteredServices = services.filter(service =>
-    (service.tenDV || service.tenDichVu || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    service.moTa.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredServices = services.filter(
+    service =>
+      (service.tenDV || service.tenDichVu || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      service.moTa.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination logic
@@ -67,7 +67,10 @@ export const ServicesPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: '400px' }}
+      >
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Đang tải...</span>
         </div>
@@ -408,8 +411,11 @@ export const ServicesPage: React.FC = () => {
       <div className="hero-section">
         <div className="container text-center">
           <h1>Dịch vụ chăm sóc xe</h1>
-          <p>Chúng tôi cung cấp đầy đủ các dịch vụ chăm sóc và bảo dưỡng xe hơi chuyên nghiệp</p>
-          
+          <p>
+            Chúng tôi cung cấp đầy đủ các dịch vụ chăm sóc và bảo dưỡng xe hơi
+            chuyên nghiệp
+          </p>
+
           <div className="row justify-content-center mt-4">
             <div className="col-md-6">
               <input
@@ -472,7 +478,9 @@ export const ServicesPage: React.FC = () => {
             )}
             {!searchTerm && (
               <p className="text-center text-muted">
-                Hiển thị {startIndex + 1}-{Math.min(endIndex, filteredServices.length)} trong tổng số {filteredServices.length} dịch vụ
+                Hiển thị {startIndex + 1}-
+                {Math.min(endIndex, filteredServices.length)} trong tổng số{' '}
+                {filteredServices.length} dịch vụ
               </p>
             )}
           </div>
@@ -480,18 +488,23 @@ export const ServicesPage: React.FC = () => {
 
         <div className="services-grid">
           {currentServices.length > 0 ? (
-            currentServices.map((service) => (
+            currentServices.map(service => (
               <div key={service.maDV || service.id} className="service-card">
                 <img
-                  src={service.hinhAnh || "https://images.pexels.com/photos/4489743/pexels-photo-4489743.jpeg"}
+                  src={
+                    service.hinhAnh ||
+                    'https://images.pexels.com/photos/4489743/pexels-photo-4489743.jpeg'
+                  }
                   alt={service.tenDV || service.tenDichVu}
                 />
                 <div className="card-body">
                   <h5>{service.tenDV || service.tenDichVu}</h5>
                   <p className="description">{service.moTa}</p>
-                  
+
                   <div className="card-footer">
-                    <span className="price">{(service.donGia || service.gia || 0).toLocaleString()}₫</span>
+                    <span className="price">
+                      {(service.donGia || service.gia || 0).toLocaleString()}₫
+                    </span>
                     <div className="d-flex align-items-center gap-2">
                       {service.trangThai ? (
                         <span className="badge bg-success">Có sẵn</span>
@@ -500,7 +513,11 @@ export const ServicesPage: React.FC = () => {
                       )}
                       <button
                         className="btn btn-book"
-                        onClick={() => navigate(`/customer/services/${service.maDV || service.id}/book`)}
+                        onClick={() =>
+                          navigate(
+                            `/customer/services/${service.maDV || service.id}/book`
+                          )
+                        }
                         disabled={!service.trangThai}
                       >
                         <i className="fas fa-calendar-plus me-2"></i>
@@ -512,8 +529,18 @@ export const ServicesPage: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="col-12 text-center py-5" style={{ gridColumn: '1 / -1' }}>
-              <i className="fas fa-search" style={{ fontSize: '64px', color: '#94a3b8', marginBottom: '1rem' }}></i>
+            <div
+              className="col-12 text-center py-5"
+              style={{ gridColumn: '1 / -1' }}
+            >
+              <i
+                className="fas fa-search"
+                style={{
+                  fontSize: '64px',
+                  color: '#94a3b8',
+                  marginBottom: '1rem',
+                }}
+              ></i>
               <h4>Không tìm thấy dịch vụ</h4>
               <p className="text-muted">Thử tìm kiếm với từ khóa khác</p>
             </div>
@@ -530,8 +557,8 @@ export const ServicesPage: React.FC = () => {
             >
               <i className="fas fa-chevron-left"></i>
             </button>
-            
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
               <button
                 key={page}
                 className={`pagination-btn ${page === currentPage ? 'active' : ''}`}
@@ -540,7 +567,7 @@ export const ServicesPage: React.FC = () => {
                 {page}
               </button>
             ))}
-            
+
             <button
               className="pagination-btn"
               onClick={() => handlePageChange(currentPage + 1)}
@@ -558,7 +585,10 @@ export const ServicesPage: React.FC = () => {
           <div className="contact-header">
             <h2 className="section-label">LIÊN HỆ VỚI CHÚNG TÔI</h2>
             <h3 className="section-title">Cần tư vấn thêm?</h3>
-            <p className="section-desc">Đội ngũ tư vấn viên của chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7. Hãy liên hệ ngay để được tư vấn miễn phí!</p>
+            <p className="section-desc">
+              Đội ngũ tư vấn viên của chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7.
+              Hãy liên hệ ngay để được tư vấn miễn phí!
+            </p>
           </div>
           <div className="contact-grid">
             <div className="contact-card">

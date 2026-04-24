@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { ServiceRequest } from '../../types/request';
-import { Service } from '../../types/service';
 import { requestService } from '../../services/requestService';
-import { serviceService } from '../../services/serviceService';
 import toast from 'react-hot-toast';
 
 export const RequestManagement: React.FC = () => {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(
+    null
+  );
 
   useEffect(() => {
     loadData();
@@ -19,12 +18,8 @@ export const RequestManagement: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [requestsData, servicesData] = await Promise.all([
-        requestService.getAll(),
-        serviceService.getAll()
-      ]);
+      const requestsData = await requestService.getAll();
       setRequests(requestsData);
-      setServices(servicesData);
     } catch (error) {
       toast.error('Lỗi khi tải dữ liệu');
       console.error('Error loading data:', error);
@@ -46,9 +41,9 @@ export const RequestManagement: React.FC = () => {
         diaChi: request.diaChi,
         maDV: request.maDV,
         trangThai: newStatus,
-        ghiChu: request.ghiChu
+        ghiChu: request.ghiChu,
       });
-      
+
       toast.success('Cập nhật trạng thái thành công');
       loadData();
     } catch (error: any) {
@@ -94,7 +89,7 @@ export const RequestManagement: React.FC = () => {
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -109,7 +104,9 @@ export const RequestManagement: React.FC = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-2xl font-bold text-gray-800">Quản lý yêu cầu dịch vụ</h3>
+        <h3 className="text-2xl font-bold text-gray-800">
+          Quản lý yêu cầu dịch vụ
+        </h3>
       </div>
 
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -137,18 +134,18 @@ export const RequestManagement: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {requests.map((request) => (
+            {requests.map(request => (
               <tr key={request.maYeuCau}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">
                     {request.tenKhachHang}
                   </div>
-                  <div className="text-sm text-gray-500">
-                    {request.diaChi}
-                  </div>
+                  <div className="text-sm text-gray-500">{request.diaChi}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{request.soDienThoai}</div>
+                  <div className="text-sm text-gray-900">
+                    {request.soDienThoai}
+                  </div>
                   <div className="text-sm text-gray-500">{request.email}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -160,7 +157,9 @@ export const RequestManagement: React.FC = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <select
                     value={request.trangThai}
-                    onChange={(e) => handleUpdateStatus(request.maYeuCau, e.target.value)}
+                    onChange={e =>
+                      handleUpdateStatus(request.maYeuCau, e.target.value)
+                    }
                     className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full border-0 ${getStatusColor(request.trangThai)}`}
                   >
                     <option value="Mới">Mới</option>
@@ -199,39 +198,71 @@ export const RequestManagement: React.FC = () => {
               </h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Khách hàng:</label>
-                  <p className="text-sm text-gray-900">{selectedRequest.tenKhachHang}</p>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Khách hàng:
+                  </label>
+                  <p className="text-sm text-gray-900">
+                    {selectedRequest.tenKhachHang}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Số điện thoại:</label>
-                  <p className="text-sm text-gray-900">{selectedRequest.soDienThoai}</p>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Số điện thoại:
+                  </label>
+                  <p className="text-sm text-gray-900">
+                    {selectedRequest.soDienThoai}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Email:</label>
-                  <p className="text-sm text-gray-900">{selectedRequest.email}</p>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Email:
+                  </label>
+                  <p className="text-sm text-gray-900">
+                    {selectedRequest.email}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Địa chỉ:</label>
-                  <p className="text-sm text-gray-900">{selectedRequest.diaChi}</p>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Địa chỉ:
+                  </label>
+                  <p className="text-sm text-gray-900">
+                    {selectedRequest.diaChi}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Dịch vụ:</label>
-                  <p className="text-sm text-gray-900">{selectedRequest.dichVu?.tenDichVu}</p>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Dịch vụ:
+                  </label>
+                  <p className="text-sm text-gray-900">
+                    {selectedRequest.dichVu?.tenDichVu}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Ngày yêu cầu:</label>
-                  <p className="text-sm text-gray-900">{formatDate(selectedRequest.ngayYeuCau)}</p>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Ngày yêu cầu:
+                  </label>
+                  <p className="text-sm text-gray-900">
+                    {formatDate(selectedRequest.ngayYeuCau)}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Trạng thái:</label>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedRequest.trangThai)}`}>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Trạng thái:
+                  </label>
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedRequest.trangThai)}`}
+                  >
                     {selectedRequest.trangThai}
                   </span>
                 </div>
                 {selectedRequest.ghiChu && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Ghi chú:</label>
-                    <p className="text-sm text-gray-900">{selectedRequest.ghiChu}</p>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Ghi chú:
+                    </label>
+                    <p className="text-sm text-gray-900">
+                      {selectedRequest.ghiChu}
+                    </p>
                   </div>
                 )}
               </div>

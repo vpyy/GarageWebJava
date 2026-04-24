@@ -9,9 +9,8 @@ export const AuthSync: React.FC = () => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    // Don't auto-load user from localStorage on app start
-    // User must manually login each time
-    // dispatch(loadUserFromStorage());
+    // Load user/token from localStorage on app start (persist login across refreshes)
+    dispatch(loadUserFromStorage());
   }, [dispatch]);
 
   useEffect(() => {

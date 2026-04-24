@@ -1,8 +1,12 @@
 import { apiService } from './api';
-import { Service, ServiceCreateRequest, ServiceUpdateRequest } from '../types/service';
+import {
+  Service,
+  ServiceCreateRequest,
+  ServiceUpdateRequest,
+} from '../types/service';
 
 class ServiceService {
-  private readonly baseUrl = '/DichVu';
+  private readonly baseUrl = '/dich-vu';
 
   async getAll(): Promise<Service[]> {
     return apiService.get<Service[]>(this.baseUrl);

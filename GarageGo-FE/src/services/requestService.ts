@@ -1,8 +1,12 @@
 import { apiService } from './api';
-import { ServiceRequest, ServiceRequestCreateRequest, ServiceRequestUpdateRequest } from '../types/request';
+import {
+  ServiceRequest,
+  ServiceRequestCreateRequest,
+  ServiceRequestUpdateRequest,
+} from '../types/request';
 
 class RequestService {
-  private readonly baseUrl = '/Yeucau';
+  private readonly baseUrl = '/yeu-cau';
 
   async getAll(): Promise<ServiceRequest[]> {
     return apiService.get<ServiceRequest[]>(this.baseUrl);
@@ -16,7 +20,10 @@ class RequestService {
     return apiService.post<ServiceRequest>(this.baseUrl, request);
   }
 
-  async update(id: number, request: ServiceRequestUpdateRequest): Promise<void> {
+  async update(
+    id: number,
+    request: ServiceRequestUpdateRequest
+  ): Promise<void> {
     return apiService.put<void>(`${this.baseUrl}/${id}`, request);
   }
 

@@ -7,52 +7,52 @@ export const AboutPage: React.FC = () => {
       position: 'Giám đốc kỹ thuật',
       experience: '15 năm kinh nghiệm',
       image: '/images/team-1.jpg',
-      description: 'Chuyên gia về động cơ và hệ thống truyền động'
+      description: 'Chuyên gia về động cơ và hệ thống truyền động',
     },
     {
       name: 'Trần Thị B',
       position: 'Trưởng phòng dịch vụ',
       experience: '12 năm kinh nghiệm',
       image: '/images/team-2.jpg',
-      description: 'Chuyên về tư vấn và chăm sóc khách hàng'
+      description: 'Chuyên về tư vấn và chăm sóc khách hàng',
     },
     {
       name: 'Lê Văn C',
       position: 'Kỹ thuật viên trưởng',
       experience: '10 năm kinh nghiệm',
       image: '/images/team-3.jpg',
-      description: 'Chuyên gia về hệ thống điện và điện tử ô tô'
+      description: 'Chuyên gia về hệ thống điện và điện tử ô tô',
     },
     {
       name: 'Phạm Thị D',
       position: 'Quản lý chất lượng',
       experience: '8 năm kinh nghiệm',
       image: '/images/team-4.jpg',
-      description: 'Đảm bảo chất lượng dịch vụ và sản phẩm'
-    }
+      description: 'Đảm bảo chất lượng dịch vụ và sản phẩm',
+    },
   ];
 
   const achievements = [
     {
       icon: 'fas fa-award',
       title: 'Chứng nhận ISO 9001:2015',
-      description: 'Hệ thống quản lý chất lượng quốc tế'
+      description: 'Hệ thống quản lý chất lượng quốc tế',
     },
     {
       icon: 'fas fa-medal',
       title: 'Top 10 Gara uy tín',
-      description: 'Được bình chọn bởi khách hàng năm 2023'
+      description: 'Được bình chọn bởi khách hàng năm 2023',
     },
     {
       icon: 'fas fa-handshake',
       title: 'Đối tác chính thức',
-      description: 'Của các hãng xe lớn tại Việt Nam'
+      description: 'Của các hãng xe lớn tại Việt Nam',
     },
     {
       icon: 'fas fa-users',
       title: '1000+ Khách hàng',
-      description: 'Tin tưởng và sử dụng dịch vụ thường xuyên'
-    }
+      description: 'Tin tưởng và sử dụng dịch vụ thường xuyên',
+    },
   ];
 
   return (
@@ -61,9 +61,7 @@ export const AboutPage: React.FC = () => {
       <section className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl font-bold mb-6">
-              Về MTProAuto
-            </h1>
+            <h1 className="text-5xl font-bold mb-6">Về MTProAuto</h1>
             <p className="text-xl opacity-90">
               Hơn 10 năm kinh nghiệm trong lĩnh vực bảo dưỡng và sửa chữa ô tô
             </p>
@@ -80,7 +78,7 @@ export const AboutPage: React.FC = () => {
                 Câu chuyện của chúng tôi
               </h2>
               <p className="text-gray-600 text-lg">
-                MTProAuto được thành lập với sứ mệnh mang đến dịch vụ bảo dưỡng 
+                MTProAuto được thành lập với sứ mệnh mang đến dịch vụ bảo dưỡng
                 và sửa chữa ô tô chất lượng cao nhất cho khách hàng Việt Nam
               </p>
             </div>
@@ -98,18 +96,18 @@ export const AboutPage: React.FC = () => {
                   Khởi đầu từ đam mê
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Được thành lập vào năm 2013 bởi một nhóm kỹ sư có đam mê với ô tô, 
-                  MTProAuto bắt đầu như một gara nhỏ với chỉ 3 nhân viên và quyết tâm 
-                  mang đến dịch vụ tốt nhất cho khách hàng.
+                  Được thành lập vào năm 2013 bởi một nhóm kỹ sư có đam mê với ô
+                  tô, MTProAuto bắt đầu như một gara nhỏ với chỉ 3 nhân viên và
+                  quyết tâm mang đến dịch vụ tốt nhất cho khách hàng.
                 </p>
                 <p className="text-gray-600 mb-4">
-                  Qua hơn 10 năm phát triển, chúng tôi đã trở thành một trong những 
-                  hệ thống gara uy tín nhất tại TP.HCM với đội ngũ hơn 50 kỹ thuật viên 
-                  chuyên nghiệp và trang thiết bị hiện đại.
+                  Qua hơn 10 năm phát triển, chúng tôi đã trở thành một trong
+                  những hệ thống gara uy tín nhất tại TP.HCM với đội ngũ hơn 50
+                  kỹ thuật viên chuyên nghiệp và trang thiết bị hiện đại.
                 </p>
                 <p className="text-gray-600">
-                  Chúng tôi tự hào đã phục vụ hơn 10,000 lượt khách hàng và duy trì 
-                  tỷ lệ hài lòng trên 98%.
+                  Chúng tôi tự hào đã phục vụ hơn 10,000 lượt khách hàng và duy
+                  trì tỷ lệ hài lòng trên 98%.
                 </p>
               </div>
             </div>
@@ -130,10 +128,10 @@ export const AboutPage: React.FC = () => {
                   Sứ mệnh
                 </h3>
                 <p className="text-gray-600">
-                  Mang đến cho khách hàng những dịch vụ bảo dưỡng và sửa chữa ô tô 
-                  chất lượng cao nhất với giá cả hợp lý, đội ngũ kỹ thuật viên chuyên 
-                  nghiệp và trang thiết bị hiện đại. Chúng tôi cam kết đảm bảo an toàn 
-                  và hiệu suất tối ưu cho chiếc xe của bạn.
+                  Mang đến cho khách hàng những dịch vụ bảo dưỡng và sửa chữa ô
+                  tô chất lượng cao nhất với giá cả hợp lý, đội ngũ kỹ thuật
+                  viên chuyên nghiệp và trang thiết bị hiện đại. Chúng tôi cam
+                  kết đảm bảo an toàn và hiệu suất tối ưu cho chiếc xe của bạn.
                 </p>
               </div>
               <div className="bg-white rounded-lg p-8 shadow-sm">
@@ -144,10 +142,10 @@ export const AboutPage: React.FC = () => {
                   Tầm nhìn
                 </h3>
                 <p className="text-gray-600">
-                  Trở thành hệ thống gara ô tô hàng đầu Việt Nam, được khách hàng 
-                  tin tưởng và lựa chọn số 1. Chúng tôi hướng tới việc mở rộng 
-                  mạng lưới trên toàn quốc và áp dụng công nghệ 4.0 vào quy trình 
-                  quản lý và dịch vụ.
+                  Trở thành hệ thống gara ô tô hàng đầu Việt Nam, được khách
+                  hàng tin tưởng và lựa chọn số 1. Chúng tôi hướng tới việc mở
+                  rộng mạng lưới trên toàn quốc và áp dụng công nghệ 4.0 vào quy
+                  trình quản lý và dịch vụ.
                 </p>
               </div>
             </div>
@@ -227,13 +225,17 @@ export const AboutPage: React.FC = () => {
                 Đội ngũ chuyên gia
               </h2>
               <p className="text-gray-600 text-lg">
-                Những con người tài năng và tận tâm tạo nên thành công của MTProAuto
+                Những con người tài năng và tận tâm tạo nên thành công của
+                MTProAuto
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {teamMembers.map((member, index) => (
-                <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div
+                  key={index}
+                  className="bg-white rounded-lg shadow-sm overflow-hidden"
+                >
                   <div className="aspect-w-1 aspect-h-1 bg-gray-200">
                     <div className="w-full h-64 bg-gray-200 flex items-center justify-center">
                       <i className="fas fa-user text-4xl text-gray-400"></i>
@@ -277,7 +279,9 @@ export const AboutPage: React.FC = () => {
               {achievements.map((achievement, index) => (
                 <div key={index} className="text-center">
                   <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i className={`${achievement.icon} text-2xl text-white`}></i>
+                    <i
+                      className={`${achievement.icon} text-2xl text-white`}
+                    ></i>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     {achievement.title}

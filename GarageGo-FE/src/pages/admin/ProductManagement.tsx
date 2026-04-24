@@ -23,7 +23,7 @@ export const ProductManagement: React.FC = () => {
     soLuongTon: 0,
     donVi: '',
     moTa: '',
-    hinhAnh: ''
+    hinhAnh: '',
   });
 
   useEffect(() => {
@@ -45,23 +45,23 @@ export const ProductManagement: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate data
     if (!formData.tenSanPham || !formData.donVi || !formData.moTa) {
       toast.error('Vui lòng điền đầy đủ thông tin');
       return;
     }
-    
+
     if (formData.donGia <= 0) {
       toast.error('Đơn giá phải lớn hơn 0');
       return;
     }
-    
+
     if (formData.soLuongTon < 0) {
       toast.error('Số lượng tồn không được âm');
       return;
     }
-    
+
     try {
       if (editingProduct) {
         const updateData = {
@@ -71,7 +71,7 @@ export const ProductManagement: React.FC = () => {
           soLuongTon: formData.soLuongTon,
           donVi: formData.donVi,
           moTa: formData.moTa,
-          hinhAnh: formData.hinhAnh || ''
+          hinhAnh: formData.hinhAnh || '',
         };
         console.log('Updating product:', updateData);
         await productService.updateProduct(updateData);
@@ -83,7 +83,7 @@ export const ProductManagement: React.FC = () => {
           soLuongTon: formData.soLuongTon,
           donVi: formData.donVi,
           moTa: formData.moTa,
-          hinhAnh: formData.hinhAnh || ''
+          hinhAnh: formData.hinhAnh || '',
         };
         console.log('Creating product:', createData);
         await productService.createProduct(createData);
@@ -96,7 +96,7 @@ export const ProductManagement: React.FC = () => {
     } catch (error: any) {
       console.error('Error submitting product:', error);
       console.error('Error response:', error.response);
-      
+
       // Handle different error types
       if (error.response?.data) {
         // If backend returns validation errors
@@ -104,7 +104,9 @@ export const ProductManagement: React.FC = () => {
           toast.error(error.response.data);
         } else if (error.response.data.errors) {
           // ASP.NET validation errors
-          const errorMessages = Object.values(error.response.data.errors).flat();
+          const errorMessages = Object.values(
+            error.response.data.errors
+          ).flat();
           toast.error(errorMessages.join(', '));
         } else if (error.response.data.title) {
           toast.error(error.response.data.title);
@@ -127,7 +129,7 @@ export const ProductManagement: React.FC = () => {
       soLuongTon: product.soLuongTon,
       donVi: product.donVi || '',
       moTa: product.moTa || '',
-      hinhAnh: product.hinhAnh || ''
+      hinhAnh: product.hinhAnh || '',
     });
     setShowModal(true);
   };
@@ -151,7 +153,7 @@ export const ProductManagement: React.FC = () => {
       soLuongTon: 0,
       donVi: '',
       moTa: '',
-      hinhAnh: ''
+      hinhAnh: '',
     });
   };
 
@@ -164,7 +166,7 @@ export const ProductManagement: React.FC = () => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
-      currency: 'VND'
+      currency: 'VND',
     }).format(amount);
   };
 
@@ -230,7 +232,7 @@ export const ProductManagement: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {products.map((product) => {
+            {products.map(product => {
               const stockStatus = getStockStatus(product.soLuongTon);
               return (
                 <tr key={product.maSP}>
@@ -262,7 +264,9 @@ export const ProductManagement: React.FC = () => {
                     {product.moTa}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${stockStatus.class}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${stockStatus.class}`}
+                    >
                       {stockStatus.text}
                     </span>
                   </td>
@@ -305,7 +309,9 @@ export const ProductManagement: React.FC = () => {
                   <input
                     type="text"
                     value={formData.tenSanPham}
-                    onChange={(e) => setFormData({ ...formData, tenSanPham: e.target.value })}
+                    onChange={e =>
+                      setFormData({ ...formData, tenSanPham: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -317,7 +323,12 @@ export const ProductManagement: React.FC = () => {
                   <input
                     type="number"
                     value={formData.donGia || ''}
-                    onChange={(e) => setFormData({ ...formData, donGia: parseFloat(e.target.value) || 0 })}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        donGia: parseFloat(e.target.value) || 0,
+                      })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                     min="0"
@@ -331,7 +342,12 @@ export const ProductManagement: React.FC = () => {
                   <input
                     type="number"
                     value={formData.soLuongTon || ''}
-                    onChange={(e) => setFormData({ ...formData, soLuongTon: parseInt(e.target.value) || 0 })}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        soLuongTon: parseInt(e.target.value) || 0,
+                      })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                     min="0"
@@ -344,7 +360,9 @@ export const ProductManagement: React.FC = () => {
                   <input
                     type="text"
                     value={formData.donVi}
-                    onChange={(e) => setFormData({ ...formData, donVi: e.target.value })}
+                    onChange={e =>
+                      setFormData({ ...formData, donVi: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Cái, Hộp, Chai..."
                     required
@@ -356,7 +374,9 @@ export const ProductManagement: React.FC = () => {
                   </label>
                   <textarea
                     value={formData.moTa}
-                    onChange={(e) => setFormData({ ...formData, moTa: e.target.value })}
+                    onChange={e =>
+                      setFormData({ ...formData, moTa: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
                     required
@@ -369,7 +389,9 @@ export const ProductManagement: React.FC = () => {
                   <input
                     type="url"
                     value={formData.hinhAnh}
-                    onChange={(e) => setFormData({ ...formData, hinhAnh: e.target.value })}
+                    onChange={e =>
+                      setFormData({ ...formData, hinhAnh: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {formData.hinhAnh && (
@@ -378,8 +400,9 @@ export const ProductManagement: React.FC = () => {
                         src={formData.hinhAnh}
                         alt="Preview"
                         className="w-full h-32 object-cover rounded"
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://via.placeholder.com/150?text=Invalid+URL';
+                        onError={e => {
+                          e.currentTarget.src =
+                            'https://via.placeholder.com/150?text=Invalid+URL';
                         }}
                       />
                     </div>

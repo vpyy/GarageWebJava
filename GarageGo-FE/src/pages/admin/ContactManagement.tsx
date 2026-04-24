@@ -28,7 +28,9 @@ export const ContactManagement: React.FC = () => {
   const handleStatusUpdate = async (id: number, daXuLy: boolean) => {
     try {
       await contactService.updateContactStatus(id, !daXuLy);
-      toast.success(!daXuLy ? 'Đã đánh dấu đã xử lý' : 'Đã đánh dấu chưa xử lý');
+      toast.success(
+        !daXuLy ? 'Đã đánh dấu đã xử lý' : 'Đã đánh dấu chưa xử lý'
+      );
       fetchContacts();
     } catch (error) {
       console.error('Error updating status:', error);
@@ -37,14 +39,15 @@ export const ContactManagement: React.FC = () => {
   };
 
   const filteredContacts = contacts.filter(contact => {
-    const matchesSearch = 
+    const matchesSearch =
       contact.hoTen.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.soDienThoai.includes(searchTerm) ||
-      (contact.chuDe && contact.chuDe.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (contact.chuDe &&
+        contact.chuDe.toLowerCase().includes(searchTerm.toLowerCase())) ||
       contact.noiDung.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesFilter = 
+    const matchesFilter =
       filterStatus === 'all' ||
       (filterStatus === 'pending' && !contact.daXuLy) ||
       (filterStatus === 'done' && contact.daXuLy);
@@ -59,7 +62,10 @@ export const ContactManagement: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: '400px' }}
+      >
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Đang tải...</span>
         </div>
@@ -337,8 +343,12 @@ export const ContactManagement: React.FC = () => {
         <div className="page-title">
           <h3>Liên hệ</h3>
           <ul className="breadcrumbs">
-            <li><a href="/admin/dashboard">Dashboard</a></li>
-            <li><i className="fas fa-chevron-right"></i></li>
+            <li>
+              <a href="/admin/dashboard">Dashboard</a>
+            </li>
+            <li>
+              <i className="fas fa-chevron-right"></i>
+            </li>
             <li>Liên hệ</li>
           </ul>
         </div>
@@ -347,72 +357,146 @@ export const ContactManagement: React.FC = () => {
       {/* Statistics Cards */}
       <div className="row g-3 mb-24">
         <div className="col-md-4">
-          <div className="wg-box" style={{ padding: '20px' }}>
-            <div className="d-flex align-items-center gap-3">
-              <div style={{
-                width: '50px',
-                height: '50px',
-                background: '#E8F1FF',
-                borderRadius: '10px',
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #2377FC 0%, #1a5fd4 100%)',
+              borderRadius: '12px',
+              padding: '20px 24px',
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div>
+              <div
+                style={{ fontSize: '13px', opacity: 0.85, marginBottom: '6px' }}
+              >
+                Tổng liên hệ
+              </div>
+              <div style={{ fontSize: '28px', fontWeight: 700 }}>
+                {contacts.length}
+              </div>
+              <div
+                style={{ fontSize: '12px', opacity: 0.75, marginTop: '4px' }}
+              >
+                <i className="fas fa-envelope me-1"></i> Tất cả liên hệ
+              </div>
+            </div>
+            <div
+              style={{
+                width: '52px',
+                height: '52px',
+                background: 'rgba(255,255,255,0.2)',
+                borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <i className="fas fa-inbox" style={{ color: '#2377FC', fontSize: '20px' }}></i>
-              </div>
-              <div>
-                <div className="text-tiny">Tổng liên hệ</div>
-                <h4 className="mb-0 fw-bold">{contacts.length}</h4>
-              </div>
+                justifyContent: 'center',
+              }}
+            >
+              <i className="fas fa-inbox" style={{ fontSize: '22px' }}></i>
             </div>
           </div>
         </div>
+
         <div className="col-md-4">
-          <div className="wg-box" style={{ padding: '20px' }}>
-            <div className="d-flex align-items-center gap-3">
-              <div style={{
-                width: '50px',
-                height: '50px',
-                background: 'rgba(34,197,94,0.1)',
-                borderRadius: '10px',
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #22C55E 0%, #16a34a 100%)',
+              borderRadius: '12px',
+              padding: '20px 24px',
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div>
+              <div
+                style={{ fontSize: '13px', opacity: 0.85, marginBottom: '6px' }}
+              >
+                Đã xử lý
+              </div>
+              <div style={{ fontSize: '28px', fontWeight: 700 }}>
+                {contacts.filter(x => x.daXuLy).length}
+              </div>
+              <div
+                style={{ fontSize: '12px', opacity: 0.75, marginTop: '4px' }}
+              >
+                <i className="fas fa-check-circle me-1"></i> Hoàn thành
+              </div>
+            </div>
+            <div
+              style={{
+                width: '52px',
+                height: '52px',
+                background: 'rgba(255,255,255,0.2)',
+                borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <i className="fas fa-check-circle" style={{ color: '#22C55E', fontSize: '20px' }}></i>
-              </div>
-              <div>
-                <div className="text-tiny">Đã xử lý</div>
-                <h4 className="mb-0 fw-bold text-success">{contacts.filter(x => x.daXuLy).length}</h4>
-              </div>
+                justifyContent: 'center',
+              }}
+            >
+              <i
+                className="fas fa-check-double"
+                style={{ fontSize: '22px' }}
+              ></i>
             </div>
           </div>
         </div>
+
         <div className="col-md-4">
-          <div className="wg-box" style={{ padding: '20px' }}>
-            <div className="d-flex align-items-center gap-3">
-              <div style={{
-                width: '50px',
-                height: '50px',
-                background: 'rgba(255,159,67,0.1)',
-                borderRadius: '10px',
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #FF9F43 0%, #e8890a 100%)',
+              borderRadius: '12px',
+              padding: '20px 24px',
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div>
+              <div
+                style={{ fontSize: '13px', opacity: 0.85, marginBottom: '6px' }}
+              >
+                Chưa xử lý
+              </div>
+              <div style={{ fontSize: '28px', fontWeight: 700 }}>
+                {contacts.filter(x => !x.daXuLy).length}
+              </div>
+              <div
+                style={{ fontSize: '12px', opacity: 0.75, marginTop: '4px' }}
+              >
+                <i className="fas fa-clock me-1"></i> Đang chờ
+              </div>
+            </div>
+            <div
+              style={{
+                width: '52px',
+                height: '52px',
+                background: 'rgba(255,255,255,0.2)',
+                borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <i className="fas fa-clock" style={{ color: '#FF9F43', fontSize: '20px' }}></i>
-              </div>
-              <div>
-                <div className="text-tiny">Chưa xử lý</div>
-                <h4 className="mb-0 fw-bold text-warning">{contacts.filter(x => !x.daXuLy).length}</h4>
-              </div>
+                justifyContent: 'center',
+              }}
+            >
+              <i
+                className="fas fa-hourglass-half"
+                style={{ fontSize: '22px' }}
+              ></i>
             </div>
           </div>
         </div>
       </div>
 
       <div className="wg-box">
-        <div className="flex-wrap-box gap10 mb-24" style={{ padding: '20px 20px 0' }}>
+        <div
+          className="flex-wrap-box gap10 mb-24"
+          style={{ padding: '20px 20px 0' }}
+        >
           <div className="wg-filter flex-grow">
             <div className="search-box">
               <i className="fas fa-search"></i>
@@ -420,7 +504,7 @@ export const ContactManagement: React.FC = () => {
                 type="text"
                 placeholder="Tìm kiếm liên hệ..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
@@ -451,6 +535,7 @@ export const ContactManagement: React.FC = () => {
             <thead>
               <tr>
                 <th>Người gửi</th>
+                <th>Số điện thoại</th>
                 <th>Email</th>
                 <th>Chủ đề</th>
                 <th>Nội dung</th>
@@ -461,7 +546,7 @@ export const ContactManagement: React.FC = () => {
             </thead>
             <tbody>
               {filteredContacts.length > 0 ? (
-                filteredContacts.map((contact) => (
+                filteredContacts.map(contact => (
                   <tr key={contact.maLienHe}>
                     <td>
                       <div className="product-item gap14">
@@ -473,28 +558,36 @@ export const ContactManagement: React.FC = () => {
                         </div>
                         <div className="flex flex-column">
                           <span className="name">{contact.hoTen}</span>
-                          <span className="text-tiny text-secondary">{contact.soDienThoai}</span>
                         </div>
                       </div>
                     </td>
+                    <td>{contact.soDienThoai}</td>
                     <td>{contact.email}</td>
                     <td>
-                      <span className="fw-semibold">{contact.chuDe || '-'}</span>
+                      <span className="fw-semibold">
+                        {contact.chuDe || '-'}
+                      </span>
                     </td>
                     <td>
                       <span className="text-secondary" title={contact.noiDung}>
-                        {contact.noiDung.length > 40 
-                          ? contact.noiDung.substring(0, 40) + '...' 
+                        {contact.noiDung.length > 40
+                          ? contact.noiDung.substring(0, 40) + '...'
                           : contact.noiDung}
                       </span>
                     </td>
-                    <td>{new Date(contact.ngayGui).toLocaleDateString('vi-VN')}</td>
+                    <td>
+                      {new Date(contact.ngayGui).toLocaleDateString('vi-VN')}
+                    </td>
                     <td>
                       <span
                         className={`badge-status ${contact.daXuLy ? 'success' : 'warning'}`}
-                        onClick={() => handleStatusUpdate(contact.maLienHe, contact.daXuLy)}
+                        onClick={() =>
+                          handleStatusUpdate(contact.maLienHe, contact.daXuLy)
+                        }
                       >
-                        <i className={`fas ${contact.daXuLy ? 'fa-check-circle' : 'fa-clock'} me-1`}></i>
+                        <i
+                          className={`fas ${contact.daXuLy ? 'fa-check-circle' : 'fa-clock'} me-1`}
+                        ></i>
                         {contact.daXuLy ? 'Đã xử lý' : 'Chưa xử lý'}
                       </span>
                     </td>
@@ -512,7 +605,7 @@ export const ContactManagement: React.FC = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="text-center py-4">
+                  <td colSpan={8} className="text-center py-4">
                     <div className="empty-state">
                       <i className="fas fa-envelope fa-3x text-muted mb-3"></i>
                       <p className="text-muted">Chưa có liên hệ nào</p>
@@ -526,11 +619,25 @@ export const ContactManagement: React.FC = () => {
 
         <div className="divider"></div>
         <div className="flex-wrap-box gap10" style={{ padding: '0 20px 20px' }}>
-          <div className="text-tiny">Hiển thị {filteredContacts.length} liên hệ</div>
+          <div className="text-tiny">
+            Hiển thị {filteredContacts.length} liên hệ
+          </div>
           <ul className="wg-pagination">
-            <li><a href="#"><i className="fas fa-chevron-left"></i></a></li>
-            <li><a href="#" className="active">1</a></li>
-            <li><a href="#"><i className="fas fa-chevron-right"></i></a></li>
+            <li>
+              <a href="#">
+                <i className="fas fa-chevron-left"></i>
+              </a>
+            </li>
+            <li>
+              <a href="#" className="active">
+                1
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <i className="fas fa-chevron-right"></i>
+              </a>
+            </li>
           </ul>
         </div>
       </div>

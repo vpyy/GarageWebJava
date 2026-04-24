@@ -45,7 +45,10 @@ const initialState: CartState = {
 
 // Calculate totals
 const calculateTotals = (items: CartItem[]) => {
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   return { total, itemCount };
 };
@@ -57,9 +60,12 @@ const cartSlice = createSlice({
     ...calculateTotals(initialState.items),
   },
   reducers: {
-    addToCart: (state, action: PayloadAction<AddToCartPayload & { isAuthenticated: boolean }>) => {
+    addToCart: (
+      state,
+      action: PayloadAction<AddToCartPayload & { isAuthenticated: boolean }>
+    ) => {
       const { isAuthenticated, ...product } = action.payload;
-      
+
       if (!isAuthenticated) {
         state.error = 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng';
         return;
@@ -67,7 +73,7 @@ const cartSlice = createSlice({
 
       state.error = null;
       const existingItem = state.items.find(item => item.id === product.id);
-      
+
       if (existingItem) {
         const newQuantity = existingItem.quantity + (product.quantity || 1);
         if (product.stock && newQuantity > product.stock) {
@@ -89,53 +95,56 @@ const cartSlice = createSlice({
           stock: product.stock,
         });
       }
-      
+
       const totals = calculateTotals(state.items);
       state.total = totals.total;
       state.itemCount = totals.itemCount;
-      
+
       localStorage.setItem('cart', JSON.stringify(state.items));
     },
     removeFromCart: (state, action: PayloadAction<number>) => {
       state.items = state.items.filter(item => item.id !== action.payload);
-      
+
       const totals = calculateTotals(state.items);
       state.total = totals.total;
       state.itemCount = totals.itemCount;
-      
+
       localStorage.setItem('cart', JSON.stringify(state.items));
     },
-    updateQuantity: (state, action: PayloadAction<{ id: number; quantity: number }>) => {
+    updateQuantity: (
+      state,
+      action: PayloadAction<{ id: number; quantity: number }>
+    ) => {
       const { id, quantity } = action.payload;
       const item = state.items.find(item => item.id === id);
-      
+
       if (item) {
         if (item.stock && quantity > item.stock) {
           state.error = `Chỉ còn ${item.stock} sản phẩm trong kho`;
           return;
         }
-        
+
         item.quantity = Math.max(0, quantity);
-        
+
         if (item.quantity === 0) {
           state.items = state.items.filter(item => item.id !== id);
         }
       }
-      
+
       const totals = calculateTotals(state.items);
       state.total = totals.total;
       state.itemCount = totals.itemCount;
-      
+
       localStorage.setItem('cart', JSON.stringify(state.items));
     },
-    clearCart: (state) => {
+    clearCart: state => {
       state.items = [];
       state.total = 0;
       state.itemCount = 0;
       state.error = null;
       localStorage.removeItem('cart');
     },
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
     syncCartWithAuth: (state, action: PayloadAction<boolean>) => {
@@ -156,13 +165,13 @@ const cartSlice = createSlice({
         state.itemCount = totals.itemCount;
       }
     },
-    toggleCart: (state) => {
+    toggleCart: state => {
       state.isOpen = !state.isOpen;
     },
-    openCart: (state) => {
+    openCart: state => {
       state.isOpen = true;
     },
-    closeCart: (state) => {
+    closeCart: state => {
       state.isOpen = false;
     },
   },

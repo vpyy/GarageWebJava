@@ -5,8 +5,13 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import toast from 'react-hot-toast';
+import { authService } from '../../services/authService';
 
-import { loginStart, loginSuccess, loginFailure } from '../../store/slices/authSlice';
+import {
+  loginStart,
+  loginSuccess,
+  loginFailure,
+} from '../../store/slices/authSlice';
 
 interface RegisterForm {
   username: string;
@@ -18,8 +23,12 @@ interface RegisterForm {
 const schema = yup.object({
   username: yup.string().required('Tên đăng nhập là bắt buộc'),
   email: yup.string().email('Email không hợp lệ'),
-  password: yup.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự').required('Mật khẩu là bắt buộc'),
-  confirmPassword: yup.string()
+  password: yup
+    .string()
+    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+    .required('Mật khẩu là bắt buộc'),
+  confirmPassword: yup
+    .string()
     .oneOf([yup.ref('password')], 'Mật khẩu xác nhận không khớp')
     .required('Xác nhận mật khẩu là bắt buộc'),
 });
@@ -42,100 +51,127 @@ export const RegisterPage: React.FC = () => {
     dispatch(loginStart());
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock registration logic
+      const response = await authService.register(data);
+
       const user = {
-        id: Date.now(),
-        username: data.username,
-        email: data.email || '',
-        role: 'Customer' as const,
-        name: data.username
+        userId: response.userId,
+        username: response.username,
+        email: response.email,
+        role: response.role,
       };
-      
-      dispatch(loginSuccess({ user, token: 'mock-register-token' }));
+      const token = response.accessToken || response.token || '';
+
+      dispatch(loginSuccess({ user, token }));
+
+      if (response.refreshToken) {
+        localStorage.setItem('refreshToken', response.refreshToken);
+      }
+
       toast.success('Đăng ký thành công!');
       navigate('/customer/home');
     } catch (error: any) {
-      dispatch(loginFailure(error.message));
-      toast.error('Có lỗi xảy ra khi đăng ký!');
+      const msg =
+        error.response?.data?.message ||
+        error.message ||
+        'Có lỗi xảy ra khi đăng ký!';
+      dispatch(loginFailure(msg));
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%)',
-      position: 'relative',
-      overflow: 'hidden',
-      padding: '40px 20px'
-    }}>
-      <div style={{
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background:
+          'linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%)',
         position: 'relative',
-        zIndex: 2,
-        maxWidth: '480px',
-        width: '100%',
-        background: 'white',
-        borderRadius: '24px',
-        padding: '3rem',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        border: '1px solid #cbd5e1'
-      }}>
-        <div style={{
-          textAlign: 'center',
-          marginBottom: '2rem'
-        }}>
-          <div style={{
-            width: '80px',
-            height: '80px',
-            margin: '0 auto 1.5rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
-            color: 'white',
-            fontSize: '2.5rem',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
-          }}>
+        overflow: 'hidden',
+        padding: '40px 20px',
+      }}
+    >
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          maxWidth: '480px',
+          width: '100%',
+          background: 'white',
+          borderRadius: '24px',
+          padding: '3rem',
+          boxShadow:
+            '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          border: '1px solid #cbd5e1',
+        }}
+      >
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: '2rem',
+          }}
+        >
+          <div
+            style={{
+              width: '80px',
+              height: '80px',
+              margin: '0 auto 1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+              color: 'white',
+              fontSize: '2.5rem',
+              boxShadow:
+                '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            }}
+          >
             <i className="fas fa-user-plus"></i>
           </div>
-          <h2 style={{
-            fontWeight: 800,
-            color: '#0f172a',
-            marginBottom: '0.5rem',
-            fontSize: '1.875rem'
-          }}>
+          <h2
+            style={{
+              fontWeight: 800,
+              color: '#0f172a',
+              marginBottom: '0.5rem',
+              fontSize: '1.875rem',
+            }}
+          >
             Đăng ký tài khoản
           </h2>
-          <p style={{
-            color: '#64748b',
-            fontSize: '0.95rem'
-          }}>
+          <p
+            style={{
+              color: '#64748b',
+              fontSize: '0.95rem',
+            }}
+          >
             Tạo tài khoản mới để sử dụng dịch vụ
           </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div style={{
-            position: 'relative',
-            marginBottom: '1.25rem'
-          }}>
-            <i style={{
-              position: 'absolute',
-              left: '1rem',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#64748b',
-              zIndex: 10,
-              fontSize: '1.1rem'
-            }} className="fas fa-user"></i>
+          <div
+            style={{
+              position: 'relative',
+              marginBottom: '1.25rem',
+            }}
+          >
+            <i
+              style={{
+                position: 'absolute',
+                left: '1rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#64748b',
+                zIndex: 10,
+                fontSize: '1.1rem',
+              }}
+              className="fas fa-user"
+            ></i>
             <input
               {...register('username')}
               type="text"
@@ -150,41 +186,48 @@ export const RegisterPage: React.FC = () => {
                 fontSize: '1rem',
                 transition: 'all 0.3s ease',
                 width: '100%',
-                outline: 'none'
+                outline: 'none',
               }}
-              onFocus={(e) => {
+              onFocus={e => {
                 e.target.style.borderColor = '#0ea5e9';
                 e.target.style.boxShadow = '0 0 0 3px rgba(14, 165, 233, 0.1)';
               }}
-              onBlur={(e) => {
+              onBlur={e => {
                 e.target.style.borderColor = '#cbd5e1';
                 e.target.style.boxShadow = 'none';
               }}
             />
             {errors.username && (
-              <div style={{
-                color: '#ef4444',
-                fontSize: '0.75rem',
-                marginTop: '0.25rem'
-              }}>
+              <div
+                style={{
+                  color: '#ef4444',
+                  fontSize: '0.75rem',
+                  marginTop: '0.25rem',
+                }}
+              >
                 {errors.username.message}
               </div>
             )}
           </div>
 
-          <div style={{
-            position: 'relative',
-            marginBottom: '1.25rem'
-          }}>
-            <i style={{
-              position: 'absolute',
-              left: '1rem',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#64748b',
-              zIndex: 10,
-              fontSize: '1.1rem'
-            }} className="fas fa-envelope"></i>
+          <div
+            style={{
+              position: 'relative',
+              marginBottom: '1.25rem',
+            }}
+          >
+            <i
+              style={{
+                position: 'absolute',
+                left: '1rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#64748b',
+                zIndex: 10,
+                fontSize: '1.1rem',
+              }}
+              className="fas fa-envelope"
+            ></i>
             <input
               {...register('email')}
               type="email"
@@ -199,41 +242,48 @@ export const RegisterPage: React.FC = () => {
                 fontSize: '1rem',
                 transition: 'all 0.3s ease',
                 width: '100%',
-                outline: 'none'
+                outline: 'none',
               }}
-              onFocus={(e) => {
+              onFocus={e => {
                 e.target.style.borderColor = '#0ea5e9';
                 e.target.style.boxShadow = '0 0 0 3px rgba(14, 165, 233, 0.1)';
               }}
-              onBlur={(e) => {
+              onBlur={e => {
                 e.target.style.borderColor = '#cbd5e1';
                 e.target.style.boxShadow = 'none';
               }}
             />
             {errors.email && (
-              <div style={{
-                color: '#ef4444',
-                fontSize: '0.75rem',
-                marginTop: '0.25rem'
-              }}>
+              <div
+                style={{
+                  color: '#ef4444',
+                  fontSize: '0.75rem',
+                  marginTop: '0.25rem',
+                }}
+              >
                 {errors.email.message}
               </div>
             )}
           </div>
 
-          <div style={{
-            position: 'relative',
-            marginBottom: '1.25rem'
-          }}>
-            <i style={{
-              position: 'absolute',
-              left: '1rem',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#64748b',
-              zIndex: 10,
-              fontSize: '1.1rem'
-            }} className="fas fa-lock"></i>
+          <div
+            style={{
+              position: 'relative',
+              marginBottom: '1.25rem',
+            }}
+          >
+            <i
+              style={{
+                position: 'absolute',
+                left: '1rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#64748b',
+                zIndex: 10,
+                fontSize: '1.1rem',
+              }}
+              className="fas fa-lock"
+            ></i>
             <input
               {...register('password')}
               type="password"
@@ -248,41 +298,48 @@ export const RegisterPage: React.FC = () => {
                 fontSize: '1rem',
                 transition: 'all 0.3s ease',
                 width: '100%',
-                outline: 'none'
+                outline: 'none',
               }}
-              onFocus={(e) => {
+              onFocus={e => {
                 e.target.style.borderColor = '#0ea5e9';
                 e.target.style.boxShadow = '0 0 0 3px rgba(14, 165, 233, 0.1)';
               }}
-              onBlur={(e) => {
+              onBlur={e => {
                 e.target.style.borderColor = '#cbd5e1';
                 e.target.style.boxShadow = 'none';
               }}
             />
             {errors.password && (
-              <div style={{
-                color: '#ef4444',
-                fontSize: '0.75rem',
-                marginTop: '0.25rem'
-              }}>
+              <div
+                style={{
+                  color: '#ef4444',
+                  fontSize: '0.75rem',
+                  marginTop: '0.25rem',
+                }}
+              >
                 {errors.password.message}
               </div>
             )}
           </div>
 
-          <div style={{
-            position: 'relative',
-            marginBottom: '1.5rem'
-          }}>
-            <i style={{
-              position: 'absolute',
-              left: '1rem',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#64748b',
-              zIndex: 10,
-              fontSize: '1.1rem'
-            }} className="fas fa-lock"></i>
+          <div
+            style={{
+              position: 'relative',
+              marginBottom: '1.5rem',
+            }}
+          >
+            <i
+              style={{
+                position: 'absolute',
+                left: '1rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#64748b',
+                zIndex: 10,
+                fontSize: '1.1rem',
+              }}
+              className="fas fa-lock"
+            ></i>
             <input
               {...register('confirmPassword')}
               type="password"
@@ -297,23 +354,25 @@ export const RegisterPage: React.FC = () => {
                 fontSize: '1rem',
                 transition: 'all 0.3s ease',
                 width: '100%',
-                outline: 'none'
+                outline: 'none',
               }}
-              onFocus={(e) => {
+              onFocus={e => {
                 e.target.style.borderColor = '#0ea5e9';
                 e.target.style.boxShadow = '0 0 0 3px rgba(14, 165, 233, 0.1)';
               }}
-              onBlur={(e) => {
+              onBlur={e => {
                 e.target.style.borderColor = '#cbd5e1';
                 e.target.style.boxShadow = 'none';
               }}
             />
             {errors.confirmPassword && (
-              <div style={{
-                color: '#ef4444',
-                fontSize: '0.75rem',
-                marginTop: '0.25rem'
-              }}>
+              <div
+                style={{
+                  color: '#ef4444',
+                  fontSize: '0.75rem',
+                  marginTop: '0.25rem',
+                }}
+              >
                 {errors.confirmPassword.message}
               </div>
             )}
@@ -324,7 +383,9 @@ export const RegisterPage: React.FC = () => {
             disabled={isSubmitting}
             style={{
               width: '100%',
-              background: isSubmitting ? '#94a3b8' : 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+              background: isSubmitting
+                ? '#94a3b8'
+                : 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
               color: 'white',
               border: 'none',
               borderRadius: '12px',
@@ -336,15 +397,16 @@ export const RegisterPage: React.FC = () => {
               marginBottom: '1rem',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
             }}
-            onMouseOver={(e) => {
+            onMouseOver={e => {
               if (!isSubmitting) {
                 e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(14, 165, 233, 0.3)';
+                e.currentTarget.style.boxShadow =
+                  '0 10px 15px -3px rgba(14, 165, 233, 0.3)';
               }
             }}
-            onMouseOut={(e) => {
+            onMouseOut={e => {
               if (!isSubmitting) {
                 e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.boxShadow = 'none';
@@ -353,15 +415,17 @@ export const RegisterPage: React.FC = () => {
           >
             {isSubmitting ? (
               <>
-                <div style={{
-                  width: '20px',
-                  height: '20px',
-                  border: '2px solid #ffffff',
-                  borderTop: '2px solid transparent',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  marginRight: '8px'
-                }}></div>
+                <div
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    border: '2px solid #ffffff',
+                    borderTop: '2px solid transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                    marginRight: '8px',
+                  }}
+                ></div>
                 Đang đăng ký...
               </>
             ) : (
@@ -369,11 +433,13 @@ export const RegisterPage: React.FC = () => {
             )}
           </button>
 
-          <div style={{
-            textAlign: 'center',
-            fontSize: '0.875rem',
-            color: '#64748b'
-          }}>
+          <div
+            style={{
+              textAlign: 'center',
+              fontSize: '0.875rem',
+              color: '#64748b',
+            }}
+          >
             Đã có tài khoản?{' '}
             <button
               type="button"
@@ -385,7 +451,7 @@ export const RegisterPage: React.FC = () => {
                 textDecoration: 'underline',
                 cursor: 'pointer',
                 fontSize: '0.875rem',
-                fontWeight: 500
+                fontWeight: 500,
               }}
             >
               Đăng nhập ngay

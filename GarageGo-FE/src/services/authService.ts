@@ -1,41 +1,39 @@
 import { apiService } from './api';
-import { LoginRequest, LoginResponse, RegisterRequest, User } from '@/types/auth';
+import {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  User,
+} from '@/types/auth';
 
 export class AuthService {
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    // Hash password on client side (matching current implementation)
-    const hashedPassword = await this.hashPassword(credentials.password);
-    
-    const response = await apiService.post<LoginResponse>('/Auth/login', {
+    const response = await apiService.post<LoginResponse>('/auth/login', {
       username: credentials.username,
-      password: hashedPassword,
+      password: credentials.password,
     });
-
     return response;
   }
 
   async register(data: RegisterRequest): Promise<LoginResponse> {
-    const hashedPassword = await this.hashPassword(data.password);
-    
-    const response = await apiService.post<LoginResponse>('/Auth/register', {
+    const response = await apiService.post<LoginResponse>('/auth/register', {
       username: data.username,
-      password: hashedPassword,
+      password: data.password,
       email: data.email,
     });
-
     return response;
   }
 
   async getCurrentUser(): Promise<User> {
-    return await apiService.get<User>('/Auth/me');
+    return await apiService.get<User>('/auth/me');
   }
 
   async refreshToken(): Promise<{ token: string }> {
-    return await apiService.post<{ token: string }>('/Auth/refresh');
+    return await apiService.post<{ token: string }>('/auth/refresh');
   }
 
   async logout(): Promise<void> {
-    await apiService.post('/Auth/logout');
+    await apiService.post('/auth/logout');
   }
 
   private async hashPassword(password: string): Promise<string> {
@@ -44,7 +42,9 @@ export class AuthService {
     const data = encoder.encode(password);
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const hashHex = hashArray
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
     return hashHex;
   }
 }

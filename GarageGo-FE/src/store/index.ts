@@ -9,7 +9,7 @@ export const store = configureStore({
     cart: cartSlice,
     ui: uiSlice,
   },
-  middleware: (getDefaultMiddleware) =>
+  middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: ['persist/PERSIST'],

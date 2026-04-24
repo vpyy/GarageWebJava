@@ -22,7 +22,10 @@ export function formatNumber(num: number): string {
 }
 
 // Format date
-export function formatDate(date: string | Date, formatStr: string = 'dd/MM/yyyy'): string {
+export function formatDate(
+  date: string | Date,
+  formatStr = 'dd/MM/yyyy'
+): string {
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
     if (!isValid(dateObj)) return '';
@@ -42,7 +45,7 @@ export function getRelativeTime(date: string | Date): string {
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : date;
     if (!isValid(dateObj)) return '';
-    
+
     const now = new Date();
     const diffInMs = now.getTime() - dateObj.getTime();
     const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
@@ -53,7 +56,7 @@ export function getRelativeTime(date: string | Date): string {
     if (diffInMinutes < 60) return `${diffInMinutes} phút trước`;
     if (diffInHours < 24) return `${diffInHours} giờ trước`;
     if (diffInDays < 7) return `${diffInDays} ngày trước`;
-    
+
     return formatDate(dateObj);
   } catch {
     return '';
@@ -117,11 +120,12 @@ export function throttle<T extends (...args: any[]) => any>(
 export function deepClone<T>(obj: T): T {
   if (obj === null || typeof obj !== 'object') return obj;
   if (obj instanceof Date) return new Date(obj.getTime()) as unknown as T;
-  if (obj instanceof Array) return obj.map(item => deepClone(item)) as unknown as T;
+  if (obj instanceof Array)
+    return obj.map(item => deepClone(item)) as unknown as T;
   if (typeof obj === 'object') {
     const clonedObj = {} as T;
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         clonedObj[key] = deepClone(obj[key]);
       }
     }
@@ -172,9 +176,17 @@ export function searchText(text: string, query: string): boolean {
 }
 
 // Generate avatar URL
-export function generateAvatarUrl(name: string, size: number = 40): string {
+export function generateAvatarUrl(name: string, size = 40): string {
   const encodedName = encodeURIComponent(name);
-  const colors = ['2377FC', '22C55E', 'FF9F43', '7367F0', 'FF5200', 'E91E63', '9C27B0'];
+  const colors = [
+    '2377FC',
+    '22C55E',
+    'FF9F43',
+    '7367F0',
+    'FF5200',
+    'E91E63',
+    '9C27B0',
+  ];
   const colorIndex = name.length % colors.length;
   return `https://ui-avatars.com/api/?name=${encodedName}&background=${colors[colorIndex]}&color=fff&size=${size}`;
 }
@@ -188,7 +200,7 @@ export function calculatePercentage(value: number, total: number): number {
 // Get status color
 export function getStatusColor(status: string): string {
   const statusColors: Record<string, string> = {
-    'Mới': 'bg-blue-100 text-blue-800',
+    Mới: 'bg-blue-100 text-blue-800',
     'Đã xác nhận': 'bg-yellow-100 text-yellow-800',
     'Đang thực hiện': 'bg-orange-100 text-orange-800',
     'Hoàn thành': 'bg-green-100 text-green-800',
@@ -200,11 +212,15 @@ export function getStatusColor(status: string): string {
 }
 
 // Sort array by property
-export function sortBy<T>(array: T[], property: keyof T, direction: 'asc' | 'desc' = 'asc'): T[] {
+export function sortBy<T>(
+  array: T[],
+  property: keyof T,
+  direction: 'asc' | 'desc' = 'asc'
+): T[] {
   return [...array].sort((a, b) => {
     const aVal = a[property];
     const bVal = b[property];
-    
+
     if (aVal < bVal) return direction === 'asc' ? -1 : 1;
     if (aVal > bVal) return direction === 'asc' ? 1 : -1;
     return 0;
@@ -213,12 +229,15 @@ export function sortBy<T>(array: T[], property: keyof T, direction: 'asc' | 'des
 
 // Group array by property
 export function groupBy<T>(array: T[], property: keyof T): Record<string, T[]> {
-  return array.reduce((groups, item) => {
-    const key = String(item[property]);
-    if (!groups[key]) {
-      groups[key] = [];
-    }
-    groups[key].push(item);
-    return groups;
-  }, {} as Record<string, T[]>);
+  return array.reduce(
+    (groups, item) => {
+      const key = String(item[property]);
+      if (!groups[key]) {
+        groups[key] = [];
+      }
+      groups[key].push(item);
+      return groups;
+    },
+    {} as Record<string, T[]>
+  );
 }

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import toast from 'react-hot-toast';
 
 interface Service {
   maDV?: number;
@@ -25,16 +28,18 @@ interface BookingForm {
 const ServiceBookingPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useSelector((state: RootState) => state.auth);
   const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
   const [form, setForm] = useState<BookingForm>({
     tenKhachHang: '',
     soDienThoai: '',
     diaChi: '',
     ngayHen: '',
     gioHen: '',
-    ghiChu: ''
+    ghiChu: '',
   });
 
   useEffect(() => {
@@ -43,30 +48,18 @@ const ServiceBookingPage: React.FC = () => {
 
   const fetchService = async () => {
     try {
-      const response = await fetch(`http://localhost:5102/api/DichVu/${id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setService(data);
-      }
-    } catch (error) {
-      console.error('Error fetching service:', error);
+      const res = await fetch(`/api/dich-vu/${id}`);
+      if (res.ok) setService(await res.json());
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setForm(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-
     try {
       const bookingData = {
         tenKhachHang: form.tenKhachHang,
@@ -75,350 +68,468 @@ const ServiceBookingPage: React.FC = () => {
         maDV: service?.maDV || service?.id || parseInt(id!),
         ghiChu: form.ghiChu,
         ngayHen: form.ngayHen,
-        gioHen: form.gioHen
+        gioHen: form.gioHen,
+        username: user?.username,
       };
-
-      const response = await fetch('http://localhost:5102/api/Yeucau', {
+      const res = await fetch('/api/yeu-cau', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
         },
-        body: JSON.stringify(bookingData)
+        body: JSON.stringify(bookingData),
       });
-
-      if (response.ok) {
-        alert('Đặt lịch thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.');
-        navigate('/services');
+      if (res.ok) {
+        setShowDialog(false);
+        toast.success(
+          'Đặt lịch thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.'
+        );
+        navigate('/customer/service-requests');
       } else {
-        alert('Có lỗi xảy ra. Vui lòng thử lại.');
+        toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
       }
-    } catch (error) {
-      console.error('Error submitting booking:', error);
-      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+    } catch {
+      toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loading) {
+  const fmt = (n: number) =>
+    new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(n);
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '8px 12px',
+    border: '1px solid #d1d5db',
+    borderRadius: '8px',
+    fontSize: '14px',
+    outline: 'none',
+    boxSizing: 'border-box',
+  };
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#374151',
+    marginBottom: '4px',
+  };
+
+  if (loading)
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Đang tải...</span>
-        </div>
+      <div
+        style={{
+          minHeight: '60vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div className="spinner-border text-primary"></div>
       </div>
     );
-  }
 
-  if (!service) {
+  if (!service)
     return (
-      <div className="container py-5 text-center">
+      <div style={{ textAlign: 'center', padding: '4rem' }}>
         <h3>Không tìm thấy dịch vụ</h3>
-        <button onClick={() => navigate('/services')} className="btn btn-primary mt-3">
-          Quay lại danh sách dịch vụ
+        <button
+          onClick={() => navigate('/customer/services')}
+          className="btn btn-primary mt-3"
+        >
+          Quay lại
         </button>
       </div>
     );
-  }
+
+  const tenDV = service.tenDV || service.tenDichVu || '';
+  const gia = service.donGia || service.gia || 0;
 
   return (
-    <div>
-      <style>{`
-        .page-header {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          padding: 3rem 0 2rem;
-          margin-bottom: 3rem;
-        }
+    <div
+      style={{ minHeight: '80vh', background: '#f8fafc', padding: '2rem 1rem' }}
+    >
+      <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+        {/* Service card */}
+        <div
+          style={{
+            background: 'white',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            marginBottom: '24px',
+          }}
+        >
+          <img
+            src={
+              service.hinhAnh ||
+              'https://images.pexels.com/photos/4489743/pexels-photo-4489743.jpeg'
+            }
+            alt={tenDV}
+            style={{ width: '100%', height: '220px', objectFit: 'cover' }}
+          />
+          <div style={{ padding: '20px 24px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                flexWrap: 'wrap',
+                gap: '12px',
+              }}
+            >
+              <div>
+                <h2
+                  style={{
+                    fontSize: '22px',
+                    fontWeight: 800,
+                    color: '#1e293b',
+                    margin: '0 0 8px',
+                  }}
+                >
+                  {tenDV}
+                </h2>
+                <p style={{ color: '#64748b', margin: 0, lineHeight: 1.6 }}>
+                  {service.moTa}
+                </p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div
+                  style={{
+                    fontSize: '24px',
+                    fontWeight: 800,
+                    color: '#0ea5e9',
+                  }}
+                >
+                  {fmt(gia)}
+                </div>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    background: service.trangThai ? '#dcfce7' : '#f1f5f9',
+                    color: service.trangThai ? '#15803d' : '#64748b',
+                  }}
+                >
+                  {service.trangThai ? '✓ Có sẵn' : 'Tạm ngưng'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        .page-header h1 {
-          font-size: 2.5rem;
-          font-weight: 800;
-          margin-bottom: 0.5rem;
-        }
+        {/* Info + nút đặt lịch */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '16px',
+            marginBottom: '24px',
+          }}
+        >
+          {[
+            { icon: 'fa-phone', text: '038 442 4567' },
+            { icon: 'fa-envelope', text: 'contact@mtproauto.vn' },
+            {
+              icon: 'fa-map-marker-alt',
+              text: 'Ngã 4 An Dương Vương, Quảng Ngãi',
+            },
+            { icon: 'fa-clock', text: 'Thứ 2 - Thứ 7: 7:30 - 17:30' },
+          ].map((item, i) => (
+            <div
+              key={i}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                background: 'white',
+                padding: '14px 16px',
+                borderRadius: '10px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
+              }}
+            >
+              <i
+                className={`fas ${item.icon}`}
+                style={{ color: '#0ea5e9', width: '18px' }}
+              ></i>
+              <span style={{ fontSize: '14px', color: '#374151' }}>
+                {item.text}
+              </span>
+            </div>
+          ))}
+        </div>
 
-        .booking-card {
-          background: white;
-          border: 1px solid #e9ecef;
-          border-radius: 1rem;
-          box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-          padding: 2.5rem;
-          margin-bottom: 2rem;
-        }
-
-        .booking-card h4 {
-          font-weight: 800;
-          color: #212529;
-          margin-bottom: 2rem;
-          padding-bottom: 1rem;
-          border-bottom: 2px solid #f8f9fa;
-        }
-
-        .service-info-card {
-          background: white;
-          border: 1px solid #e9ecef;
-          border-radius: 1rem;
-          box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-          overflow: hidden;
-          margin-bottom: 1.5rem;
-        }
-
-        .service-info-card img {
-          width: 100%;
-          height: 200px;
-          object-fit: cover;
-        }
-
-        .service-info-card .card-body {
-          padding: 1.5rem;
-        }
-
-        .service-info-card h6 {
-          font-weight: 700;
-          color: #212529;
-          margin-bottom: 0.75rem;
-        }
-
-        .service-info-card .text-muted {
-          color: #6c757d !important;
-          font-size: 0.9rem;
-          line-height: 1.6;
-        }
-
-        .price-badge {
-          font-size: 1.5rem;
-          font-weight: 800;
-          color: #0d6efd;
-        }
-
-        .contact-info-card {
-          background: #f8f9fa;
-          border: 1px solid #e9ecef;
-          border-radius: 1rem;
-          padding: 1.5rem;
-        }
-
-        .contact-info-card h6 {
-          font-weight: 700;
-          color: #212529;
-          margin-bottom: 1rem;
-        }
-
-        .contact-info-card p {
-          color: #6c757d;
-          margin-bottom: 0.75rem;
-          display: flex;
-          align-items: center;
-        }
-
-        .contact-info-card i {
-          color: #0d6efd;
-          width: 24px;
-        }
-
-        /* Form styling */
-        .form-label {
-          font-weight: 600;
-          color: #495057;
-          margin-bottom: 0.5rem;
-        }
-
-        .form-control {
-          border: 1px solid #ced4da;
-          border-radius: 0.5rem;
-          padding: 0.75rem 1rem;
-          font-size: 0.95rem;
-          transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        }
-
-        .form-control:focus {
-          border-color: #0d6efd;
-          box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-        }
-
-        .btn-primary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border: none;
-          border-radius: 0.5rem;
-          padding: 0.75rem 1.5rem;
-          font-weight: 600;
-          transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-outline-primary {
-          border: 2px solid #0d6efd;
-          color: #0d6efd;
-          border-radius: 0.5rem;
-          padding: 0.75rem 1.5rem;
-          font-weight: 600;
-          transition: all 0.3s ease;
-        }
-
-        .btn-outline-primary:hover {
-          background: #0d6efd;
-          color: white;
-          transform: translateY(-2px);
-        }
-      `}</style>
-
-      <div className="page-header">
-        <div className="container text-center">
-          <h1>Đặt lịch hẹn dịch vụ</h1>
-          <p>Vui lòng điền đầy đủ thông tin để chúng tôi có thể phục vụ bạn tốt nhất</p>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            onClick={() => navigate('/customer/services')}
+            style={{
+              flex: 1,
+              padding: '14px',
+              background: '#f1f5f9',
+              color: '#64748b',
+              border: 'none',
+              borderRadius: '10px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontSize: '15px',
+            }}
+          >
+            <i className="fas fa-arrow-left me-2"></i>Quay lại
+          </button>
+          <button
+            onClick={() => setShowDialog(true)}
+            disabled={!service.trangThai}
+            style={{
+              flex: 2,
+              padding: '14px',
+              background: service.trangThai
+                ? 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)'
+                : '#e5e7eb',
+              color: service.trangThai ? 'white' : '#94a3b8',
+              border: 'none',
+              borderRadius: '10px',
+              fontWeight: 700,
+              cursor: service.trangThai ? 'pointer' : 'not-allowed',
+              fontSize: '15px',
+            }}
+          >
+            <i className="fas fa-calendar-check me-2"></i>Đặt lịch ngay
+          </button>
         </div>
       </div>
 
-      <div className="container pb-5">
-        <div className="row">
-          <div className="col-lg-8">
-            <div className="booking-card">
-              <h4><i className="fas fa-calendar-check me-2"></i>Thông tin đặt lịch</h4>
-              <form onSubmit={handleSubmit}>
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="tenKhachHang" className="form-label">Họ và tên *</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="tenKhachHang"
-                      name="tenKhachHang"
-                      value={form.tenKhachHang}
-                      onChange={handleInputChange}
-                      placeholder="Nguyễn Văn A"
-                      required
-                    />
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="soDienThoai" className="form-label">Số điện thoại *</label>
-                    <input
-                      type="tel"
-                      className="form-control"
-                      id="soDienThoai"
-                      name="soDienThoai"
-                      value={form.soDienThoai}
-                      onChange={handleInputChange}
-                      placeholder="0123456789"
-                      required
-                    />
-                  </div>
+      {/* Dialog đặt lịch */}
+      {showDialog && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem',
+          }}
+          onClick={() => setShowDialog(false)}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '16px',
+              width: '100%',
+              maxWidth: '600px',
+              maxHeight: '90vh',
+              overflow: 'auto',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div
+              style={{
+                padding: '20px 24px',
+                background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+                borderRadius: '16px 16px 0 0',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <div>
+                <h3
+                  style={{
+                    margin: 0,
+                    color: 'white',
+                    fontWeight: 700,
+                    fontSize: '18px',
+                  }}
+                >
+                  <i className="fas fa-calendar-check me-2"></i>Đặt lịch dịch vụ
+                </h3>
+                <div
+                  style={{
+                    color: 'rgba(255,255,255,0.8)',
+                    fontSize: '13px',
+                    marginTop: '4px',
+                  }}
+                >
+                  {tenDV} — {fmt(gia)}
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="diaChi" className="form-label">Địa chỉ *</label>
-                  <textarea
-                    className="form-control"
-                    id="diaChi"
-                    name="diaChi"
-                    value={form.diaChi}
-                    onChange={handleInputChange}
-                    rows={3}
-                    placeholder="Nhập địa chỉ của bạn"
+              </div>
+              <button
+                onClick={() => setShowDialog(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  border: 'none',
+                  color: 'white',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
+              {/* Họ tên + SĐT */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '16px',
+                  marginBottom: '16px',
+                }}
+              >
+                <div>
+                  <label style={labelStyle}>Họ và tên *</label>
+                  <input
+                    style={inputStyle}
+                    type="text"
+                    value={form.tenKhachHang}
+                    onChange={e =>
+                      setForm({ ...form, tenKhachHang: e.target.value })
+                    }
+                    placeholder="Nguyễn Văn A"
                     required
                   />
                 </div>
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="ngayHen" className="form-label">Ngày đến gara *</label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      id="ngayHen"
-                      name="ngayHen"
-                      value={form.ngayHen}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="gioHen" className="form-label">Giờ hẹn *</label>
-                    <input
-                      type="time"
-                      className="form-control"
-                      id="gioHen"
-                      name="gioHen"
-                      value={form.gioHen}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="mb-4">
-                  <label htmlFor="ghiChu" className="form-label">Ghi chú</label>
-                  <textarea
-                    className="form-control"
-                    id="ghiChu"
-                    name="ghiChu"
-                    value={form.ghiChu}
-                    onChange={handleInputChange}
-                    rows={4}
-                    placeholder="Mô tả chi tiết về vấn đề của xe hoặc yêu cầu đặc biệt..."
+                <div>
+                  <label style={labelStyle}>Số điện thoại *</label>
+                  <input
+                    style={inputStyle}
+                    type="tel"
+                    value={form.soDienThoai}
+                    onChange={e =>
+                      setForm({ ...form, soDienThoai: e.target.value })
+                    }
+                    placeholder="0123456789"
+                    required
                   />
                 </div>
-                <div className="d-flex gap-3 justify-content-end">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/customer/services')}
-                    className="btn btn-outline-primary me-md-2"
-                  >
-                    <i className="fas fa-arrow-left me-2"></i>Quay lại
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-primary btn-lg"
-                    disabled={submitting}
-                  >
-                    {submitting ? (
-                      <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Đang xử lý...
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-check me-2"></i>Xác nhận đặt lịch
-                      </>
-                    )}
-                  </button>
+              </div>
+
+              {/* Địa chỉ */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={labelStyle}>Địa chỉ *</label>
+                <textarea
+                  style={{ ...inputStyle, resize: 'none' }}
+                  rows={2}
+                  value={form.diaChi}
+                  onChange={e => setForm({ ...form, diaChi: e.target.value })}
+                  placeholder="Nhập địa chỉ của bạn"
+                  required
+                />
+              </div>
+
+              {/* Ngày + Giờ */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '16px',
+                  marginBottom: '16px',
+                }}
+              >
+                <div>
+                  <label style={labelStyle}>Ngày hẹn *</label>
+                  <input
+                    style={inputStyle}
+                    type="date"
+                    value={form.ngayHen}
+                    onChange={e =>
+                      setForm({ ...form, ngayHen: e.target.value })
+                    }
+                    min={new Date().toISOString().split('T')[0]}
+                    required
+                  />
                 </div>
-              </form>
-            </div>
-          </div>
-          <div className="col-lg-4">
-            <div className="service-info-card">
-              <img
-                src={service.hinhAnh || "https://images.pexels.com/photos/4489743/pexels-photo-4489743.jpeg"}
-                alt={service.tenDV || service.tenDichVu}
-              />
-              <div className="card-body">
-                <h6>{service.tenDV || service.tenDichVu}</h6>
-                <p className="text-muted mb-3">{service.moTa}</p>
-                <div className="d-flex justify-content-between align-items-center">
-                  <span className="price-badge">{(service.donGia || service.gia || 0).toLocaleString()} ₫</span>
-                  {service.trangThai ? (
-                    <span className="badge bg-success">
-                      <i className="fas fa-check me-1"></i>Có sẵn
-                    </span>
-                  ) : (
-                    <span className="badge bg-secondary">
-                      <i className="fas fa-pause me-1"></i>Tạm ngưng
-                    </span>
-                  )}
+                <div>
+                  <label style={labelStyle}>Giờ hẹn *</label>
+                  <input
+                    style={inputStyle}
+                    type="time"
+                    value={form.gioHen}
+                    onChange={e => setForm({ ...form, gioHen: e.target.value })}
+                    required
+                  />
                 </div>
               </div>
-            </div>
-            
-            <div className="contact-info-card">
-              <h6><i className="fas fa-info-circle me-2"></i>Thông tin liên hệ</h6>
-              <p><i className="fas fa-phone"></i>038 442 4567</p>
-              <p><i className="fas fa-envelope"></i>contact@mtproauto.vn</p>
-              <p className="mb-0"><i className="fas fa-map-marker-alt"></i>Ngã 4 An Dương Vương, Trần Phú, Quảng Ngãi</p>
-            </div>
+
+              {/* Ghi chú */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={labelStyle}>
+                  Ghi chú về xe / yêu cầu đặc biệt
+                </label>
+                <textarea
+                  style={{ ...inputStyle, resize: 'none' }}
+                  rows={3}
+                  value={form.ghiChu}
+                  onChange={e => setForm({ ...form, ghiChu: e.target.value })}
+                  placeholder="Mô tả vấn đề của xe hoặc yêu cầu đặc biệt..."
+                />
+              </div>
+
+              {/* Nút */}
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '12px',
+                  justifyContent: 'flex-end',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setShowDialog(false)}
+                  style={{
+                    padding: '10px 20px',
+                    background: '#f1f5f9',
+                    color: '#64748b',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  style={{
+                    padding: '10px 24px',
+                    background:
+                      'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {submitting ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2"></span>
+                      Đang xử lý...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-check me-2"></i>Xác nhận đặt lịch
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

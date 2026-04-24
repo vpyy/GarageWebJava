@@ -9,7 +9,9 @@ interface AdminHeaderProps {
   onToggleSidebar: () => void;
 }
 
-export const AdminHeader: React.FC<AdminHeaderProps> = ({ onToggleSidebar }) => {
+export const AdminHeader: React.FC<AdminHeaderProps> = ({
+  onToggleSidebar,
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
@@ -39,7 +41,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onToggleSidebar }) => 
         {/* Search */}
         <div className="hidden md:flex items-center">
           <div className="relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400">🔍</span>
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400">
+              🔍
+            </span>
             <input
               type="text"
               placeholder="Tìm kiếm..."
@@ -73,19 +77,21 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onToggleSidebar }) => 
               </div>
               <div className="max-h-80 overflow-y-auto">
                 {notifications.length > 0 ? (
-                  notifications.slice(0, 5).map((notification) => (
+                  notifications.slice(0, 5).map(notification => (
                     <div
                       key={notification.id}
                       className="p-4 border-b border-secondary-100 hover:bg-secondary-50"
                     >
                       <div className="flex items-start space-x-3">
-                        <div className={cn(
-                          'w-2 h-2 rounded-full mt-2',
-                          notification.type === 'success' && 'bg-success-500',
-                          notification.type === 'error' && 'bg-danger-500',
-                          notification.type === 'warning' && 'bg-warning-500',
-                          notification.type === 'info' && 'bg-primary-500'
-                        )} />
+                        <div
+                          className={cn(
+                            'w-2 h-2 rounded-full mt-2',
+                            notification.type === 'success' && 'bg-success-500',
+                            notification.type === 'error' && 'bg-danger-500',
+                            notification.type === 'warning' && 'bg-warning-500',
+                            notification.type === 'info' && 'bg-primary-500'
+                          )}
+                        />
                         <div className="flex-1">
                           <p className="text-sm font-medium text-secondary-900">
                             {notification.title}
@@ -138,14 +144,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onToggleSidebar }) => 
           {showUserMenu && (
             <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-secondary-200 rounded-lg shadow-large z-50">
               <div className="p-2">
-                <button className="flex items-center space-x-3 w-full px-3 py-2 text-left rounded-lg hover:bg-secondary-50 transition-colors">
-                  <span className="text-secondary-400">👤</span>
-                  <span className="text-sm text-secondary-700">Hồ sơ</span>
-                </button>
-                <button className="flex items-center space-x-3 w-full px-3 py-2 text-left rounded-lg hover:bg-secondary-50 transition-colors">
-                  <span className="text-secondary-400">⚙️</span>
-                  <span className="text-sm text-secondary-700">Cài đặt</span>
-                </button>
                 <hr className="my-2 border-secondary-200" />
                 <button
                   onClick={handleLogout}

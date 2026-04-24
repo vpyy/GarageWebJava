@@ -13,7 +13,7 @@ export const ServiceManagement: React.FC = () => {
     gia: 0,
     moTa: '',
     hinhAnh: '',
-    trangThai: true
+    trangThai: true,
   });
 
   useEffect(() => {
@@ -37,7 +37,10 @@ export const ServiceManagement: React.FC = () => {
     e.preventDefault();
     try {
       if (editingService) {
-        await serviceService.update(editingService.maDV, { ...formData, id: editingService.maDV });
+        await serviceService.update(editingService.maDV, {
+          ...formData,
+          id: editingService.maDV,
+        });
         toast.success('Cập nhật dịch vụ thành công');
       } else {
         await serviceService.create(formData);
@@ -59,7 +62,7 @@ export const ServiceManagement: React.FC = () => {
       gia: service.donGia,
       moTa: service.moTa,
       hinhAnh: service.hinhAnh || '',
-      trangThai: service.trangThai
+      trangThai: service.trangThai,
     });
     setShowModal(true);
   };
@@ -82,7 +85,7 @@ export const ServiceManagement: React.FC = () => {
       gia: 0,
       moTa: '',
       hinhAnh: '',
-      trangThai: true
+      trangThai: true,
     });
   };
 
@@ -95,7 +98,7 @@ export const ServiceManagement: React.FC = () => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
-      currency: 'VND'
+      currency: 'VND',
     }).format(amount);
   };
 
@@ -145,7 +148,7 @@ export const ServiceManagement: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {services.map((service) => (
+            {services.map(service => (
               <tr key={service.maDV}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {service.tenDV}
@@ -169,11 +172,13 @@ export const ServiceManagement: React.FC = () => {
                   {service.moTa}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    service.trangThai 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      service.trangThai
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
                     {service.trangThai ? 'Hoạt động' : 'Ngừng hoạt động'}
                   </span>
                 </td>
@@ -213,7 +218,9 @@ export const ServiceManagement: React.FC = () => {
                   <input
                     type="text"
                     value={formData.tenDichVu}
-                    onChange={(e) => setFormData({ ...formData, tenDichVu: e.target.value })}
+                    onChange={e =>
+                      setFormData({ ...formData, tenDichVu: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
@@ -225,7 +232,12 @@ export const ServiceManagement: React.FC = () => {
                   <input
                     type="number"
                     value={formData.gia}
-                    onChange={(e) => setFormData({ ...formData, gia: parseFloat(e.target.value) })}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        gia: parseFloat(e.target.value),
+                      })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                     min="0"
@@ -237,7 +249,9 @@ export const ServiceManagement: React.FC = () => {
                   </label>
                   <textarea
                     value={formData.moTa}
-                    onChange={(e) => setFormData({ ...formData, moTa: e.target.value })}
+                    onChange={e =>
+                      setFormData({ ...formData, moTa: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
                     required
@@ -250,7 +264,9 @@ export const ServiceManagement: React.FC = () => {
                   <input
                     type="url"
                     value={formData.hinhAnh}
-                    onChange={(e) => setFormData({ ...formData, hinhAnh: e.target.value })}
+                    onChange={e =>
+                      setFormData({ ...formData, hinhAnh: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -259,10 +275,17 @@ export const ServiceManagement: React.FC = () => {
                     <input
                       type="checkbox"
                       checked={formData.trangThai}
-                      onChange={(e) => setFormData({ ...formData, trangThai: e.target.checked })}
+                      onChange={e =>
+                        setFormData({
+                          ...formData,
+                          trangThai: e.target.checked,
+                        })
+                      }
                       className="mr-2"
                     />
-                    <span className="text-sm font-medium text-gray-700">Hoạt động</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Hoạt động
+                    </span>
                   </label>
                 </div>
                 <div className="flex justify-end gap-3">

@@ -1,6 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Car, Phone, Mail, MapPin, Facebook, Instagram, Youtube } from 'lucide-react';
+import {
+  Car,
+  Phone,
+  Mail,
+  MapPin,
+  Facebook,
+  Instagram,
+  Youtube,
+} from 'lucide-react';
 
 export const PublicFooter: React.FC = () => {
   return (
@@ -15,12 +23,15 @@ export const PublicFooter: React.FC = () => {
               </div>
               <div>
                 <h3 className="text-xl font-bold">GarageGo</h3>
-                <p className="text-secondary-400 text-sm">Gara ô tô chuyên nghiệp</p>
+                <p className="text-secondary-400 text-sm">
+                  Gara ô tô chuyên nghiệp
+                </p>
               </div>
             </div>
             <p className="text-secondary-300 text-sm leading-relaxed">
-              Chúng tôi cung cấp dịch vụ sửa chữa, bảo dưỡng ô tô chuyên nghiệp với đội ngũ 
-              kỹ thuật viên giàu kinh nghiệm và trang thiết bị hiện đại.
+              Chúng tôi cung cấp dịch vụ sửa chữa, bảo dưỡng ô tô chuyên nghiệp
+              với đội ngũ kỹ thuật viên giàu kinh nghiệm và trang thiết bị hiện
+              đại.
             </p>
             <div className="flex space-x-4">
               <a
@@ -91,7 +102,9 @@ export const PublicFooter: React.FC = () => {
               <li className="text-secondary-300 text-sm">Sửa chữa động cơ</li>
               <li className="text-secondary-300 text-sm">Thay dầu máy</li>
               <li className="text-secondary-300 text-sm">Kiểm tra hệ thống</li>
-              <li className="text-secondary-300 text-sm">Rửa xe chuyên nghiệp</li>
+              <li className="text-secondary-300 text-sm">
+                Rửa xe chuyên nghiệp
+              </li>
             </ul>
           </div>
 
@@ -103,7 +116,8 @@ export const PublicFooter: React.FC = () => {
                 <MapPin className="w-5 h-5 text-primary-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-secondary-300 text-sm">
-                    123 Đường ABC, Quận XYZ<br />
+                    123 Đường ABC, Quận XYZ
+                    <br />
                     TP. Hồ Chí Minh, Việt Nam
                   </p>
                 </div>

@@ -24,9 +24,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
         <div className={cn('animate-spin text-primary-600', sizeClasses[size])}>
           <span>⟳</span>
         </div>
-        {text && (
-          <p className="text-sm text-secondary-600">{text}</p>
-        )}
+        {text && <p className="text-sm text-secondary-600">{text}</p>}
       </div>
     </div>
   );

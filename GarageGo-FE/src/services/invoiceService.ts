@@ -2,7 +2,7 @@ import { apiService } from './api';
 import { Invoice, InvoiceCreateRequest } from '../types/invoice';
 
 class InvoiceService {
-  private readonly baseUrl = '/HoaDon';
+  private readonly baseUrl = '/hoa-don';
 
   async getAll(): Promise<Invoice[]> {
     return apiService.get<Invoice[]>(this.baseUrl);
@@ -17,7 +17,7 @@ class InvoiceService {
   }
 
   async complete(id: number): Promise<void> {
-    return apiService.put<void>(`${this.baseUrl}/${id}/Complete`);
+    return apiService.put<void>(`${this.baseUrl}/${id}/complete`);
   }
 
   async delete(id: number): Promise<void> {

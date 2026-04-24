@@ -27,6 +27,8 @@ export interface LoginResponse {
   email?: string;
   role: 'Admin' | 'Customer';
   token?: string;
+  accessToken?: string;
+  refreshToken?: string;
 }
 
 export interface AuthContextType {

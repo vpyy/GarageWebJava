@@ -18,16 +18,21 @@ export const AdminDashboard: React.FC = () => {
       setDashboardData(data);
     } catch (error: any) {
       console.error('Error loading dashboard:', error);
-      
+
       // Hiển thị lỗi chi tiết hơn
       if (error.response?.status === 404) {
         toast.error('API thống kê không tìm thấy');
       } else if (error.response?.status === 500) {
         toast.error('Lỗi server khi tải dữ liệu thống kê');
-      } else if (error.code === 'NETWORK_ERROR' || error.message?.includes('Network Error')) {
+      } else if (
+        error.code === 'NETWORK_ERROR' ||
+        error.message?.includes('Network Error')
+      ) {
         toast.error('Không thể kết nối đến server. Vui lòng kiểm tra kết nối.');
       } else {
-        toast.error('Lỗi khi tải dữ liệu thống kê: ' + (error.message || 'Unknown error'));
+        toast.error(
+          'Lỗi khi tải dữ liệu thống kê: ' + (error.message || 'Unknown error')
+        );
       }
     } finally {
       setLoading(false);
@@ -37,7 +42,7 @@ export const AdminDashboard: React.FC = () => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
-      currency: 'VND'
+      currency: 'VND',
     }).format(amount);
   };
 
@@ -45,19 +50,27 @@ export const AdminDashboard: React.FC = () => {
     const statusConfig = {
       'Hoàn thành': { bg: '#dcfce7', color: '#166534', text: 'Hoàn thành' },
       'Đang xử lý': { bg: '#fef3c7', color: '#92400e', text: 'Đang xử lý' },
-      'Chờ thanh toán': { bg: '#fee2e2', color: '#991b1b', text: 'Chờ thanh toán' }
+      'Chờ thanh toán': {
+        bg: '#fee2e2',
+        color: '#991b1b',
+        text: 'Chờ thanh toán',
+      },
     };
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig['Đang xử lý'];
-    
+    const config =
+      statusConfig[status as keyof typeof statusConfig] ||
+      statusConfig['Đang xử lý'];
+
     return (
-      <span style={{
-        background: config.bg,
-        color: config.color,
-        padding: '4px 8px',
-        borderRadius: '6px',
-        fontSize: '12px',
-        fontWeight: 500
-      }}>
+      <span
+        style={{
+          background: config.bg,
+          color: config.color,
+          padding: '4px 8px',
+          borderRadius: '6px',
+          fontSize: '12px',
+          fontWeight: 500,
+        }}
+      >
         {config.text}
       </span>
     );
@@ -80,7 +93,9 @@ export const AdminDashboard: React.FC = () => {
         <div className="text-red-500 mb-4">
           <i className="fas fa-exclamation-triangle text-4xl"></i>
         </div>
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">Không thể tải dữ liệu</h3>
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">
+          Không thể tải dữ liệu
+        </h3>
         <button
           onClick={loadDashboardData}
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
@@ -99,8 +114,12 @@ export const AdminDashboard: React.FC = () => {
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-100 text-sm font-medium">Doanh thu tháng</p>
-              <p className="text-2xl font-bold">{formatCurrency(dashboardData.doanhThuThangNay)}</p>
+              <p className="text-blue-100 text-sm font-medium">
+                Doanh thu tháng
+              </p>
+              <p className="text-2xl font-bold">
+                {formatCurrency(dashboardData.doanhThuThangNay)}
+              </p>
               <p className="text-blue-100 text-sm mt-1">
                 <i className="fas fa-file-invoice mr-1"></i>
                 {dashboardData.soHoaDonThangNay} hóa đơn
@@ -116,8 +135,12 @@ export const AdminDashboard: React.FC = () => {
         <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-100 text-sm font-medium">Tổng khách hàng</p>
-              <p className="text-2xl font-bold">{dashboardData.tongKhachHang.toLocaleString()}</p>
+              <p className="text-green-100 text-sm font-medium">
+                Tổng khách hàng
+              </p>
+              <p className="text-2xl font-bold">
+                {dashboardData.tongKhachHang.toLocaleString()}
+              </p>
               <p className="text-green-100 text-sm mt-1">
                 <i className="fas fa-arrow-up mr-1"></i>
                 Hoạt động
@@ -133,7 +156,9 @@ export const AdminDashboard: React.FC = () => {
         <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-100 text-sm font-medium">Tổng sản phẩm</p>
+              <p className="text-purple-100 text-sm font-medium">
+                Tổng sản phẩm
+              </p>
               <p className="text-2xl font-bold">{dashboardData.tongSanPham}</p>
               <p className="text-purple-100 text-sm mt-1">
                 <i className="fas fa-exclamation-triangle mr-1"></i>
@@ -150,7 +175,9 @@ export const AdminDashboard: React.FC = () => {
         <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-100 text-sm font-medium">Tổng dịch vụ</p>
+              <p className="text-orange-100 text-sm font-medium">
+                Tổng dịch vụ
+              </p>
               <p className="text-2xl font-bold">{dashboardData.tongDichVu}</p>
               <p className="text-orange-100 text-sm mt-1">
                 <i className="fas fa-tools mr-1"></i>
@@ -169,19 +196,28 @@ export const AdminDashboard: React.FC = () => {
         {/* Revenue Chart */}
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-gray-800">Doanh thu theo tháng</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              Doanh thu theo tháng
+            </h3>
             <span className="text-sm text-gray-500">Năm {namHienTai}</span>
           </div>
-          
-          {dashboardData.doanhThuTheoThang && dashboardData.doanhThuTheoThang.length > 0 ? (
+
+          {dashboardData.doanhThuTheoThang &&
+          dashboardData.doanhThuTheoThang.length > 0 ? (
             <div className="flex items-end justify-between h-64 gap-2">
               {dashboardData.doanhThuTheoThang.map((item, index) => {
-                const maxDoanhThu = Math.max(...dashboardData.doanhThuTheoThang.map(x => x.doanhThu));
-                const height = maxDoanhThu > 0 ? (item.doanhThu / maxDoanhThu) * 100 : 0;
+                const maxDoanhThu = Math.max(
+                  ...dashboardData.doanhThuTheoThang.map(x => x.doanhThu)
+                );
+                const height =
+                  maxDoanhThu > 0 ? (item.doanhThu / maxDoanhThu) * 100 : 0;
                 const isCurrentMonth = item.thang === thangHienTai;
-                
+
                 return (
-                  <div key={index} className="flex flex-col items-center flex-1">
+                  <div
+                    key={index}
+                    className="flex flex-col items-center flex-1"
+                  >
                     <div
                       className={`w-full rounded-t-lg transition-all hover:opacity-80 ${
                         isCurrentMonth ? 'bg-blue-500' : 'bg-blue-200'
@@ -189,7 +225,9 @@ export const AdminDashboard: React.FC = () => {
                       style={{ height: `${height}%`, minHeight: '8px' }}
                       title={`Tháng ${item.thang}: ${formatCurrency(item.doanhThu)}`}
                     ></div>
-                    <span className="text-xs text-gray-500 mt-2">T{item.thang}</span>
+                    <span className="text-xs text-gray-500 mt-2">
+                      T{item.thang}
+                    </span>
                   </div>
                 );
               })}
@@ -206,22 +244,37 @@ export const AdminDashboard: React.FC = () => {
 
         {/* Top Products */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Sản phẩm bán chạy</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Sản phẩm bán chạy
+          </h3>
           <div className="space-y-3">
             {dashboardData.topSanPham && dashboardData.topSanPham.length > 0 ? (
               dashboardData.topSanPham.slice(0, 5).map((product, index) => (
-                <div key={product.maSP} className="flex items-center justify-between">
+                <div
+                  key={product.maSP}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
-                      index === 0 ? 'bg-yellow-500' : 
-                      index === 1 ? 'bg-gray-400' : 
-                      index === 2 ? 'bg-orange-500' : 'bg-blue-500'
-                    }`}>
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
+                        index === 0
+                          ? 'bg-yellow-500'
+                          : index === 1
+                            ? 'bg-gray-400'
+                            : index === 2
+                              ? 'bg-orange-500'
+                              : 'bg-blue-500'
+                      }`}
+                    >
                       {index + 1}
                     </div>
                     <div>
-                      <p className="font-medium text-gray-800 text-sm">{product.tenSP}</p>
-                      <p className="text-xs text-gray-500">{product.soLuong} đã bán</p>
+                      <p className="font-medium text-gray-800 text-sm">
+                        {product.tenSP}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {product.soLuong} đã bán
+                      </p>
                     </div>
                   </div>
                   <span className="text-sm font-semibold text-green-600">
@@ -244,30 +297,49 @@ export const AdminDashboard: React.FC = () => {
         {/* Recent Orders */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">Hóa đơn gần đây</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              Hóa đơn gần đây
+            </h3>
             <button className="text-blue-500 hover:text-blue-600 text-sm font-medium">
               Xem tất cả →
             </button>
           </div>
-          
-          {dashboardData.hoaDonGanDay && dashboardData.hoaDonGanDay.length > 0 ? (
+
+          {dashboardData.hoaDonGanDay &&
+          dashboardData.hoaDonGanDay.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    <th className="text-left py-2 text-xs font-medium text-gray-500 uppercase">Mã HĐ</th>
-                    <th className="text-left py-2 text-xs font-medium text-gray-500 uppercase">Khách hàng</th>
-                    <th className="text-left py-2 text-xs font-medium text-gray-500 uppercase">Biển số</th>
-                    <th className="text-right py-2 text-xs font-medium text-gray-500 uppercase">Tổng tiền</th>
-                    <th className="text-center py-2 text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
+                    <th className="text-left py-2 text-xs font-medium text-gray-500 uppercase">
+                      Mã HĐ
+                    </th>
+                    <th className="text-left py-2 text-xs font-medium text-gray-500 uppercase">
+                      Khách hàng
+                    </th>
+                    <th className="text-left py-2 text-xs font-medium text-gray-500 uppercase">
+                      Biển số
+                    </th>
+                    <th className="text-right py-2 text-xs font-medium text-gray-500 uppercase">
+                      Tổng tiền
+                    </th>
+                    <th className="text-center py-2 text-xs font-medium text-gray-500 uppercase">
+                      Trạng thái
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {dashboardData.hoaDonGanDay.slice(0, 6).map((invoice) => (
+                  {dashboardData.hoaDonGanDay.slice(0, 6).map(invoice => (
                     <tr key={invoice.maHD} className="border-b border-gray-50">
-                      <td className="py-3 text-sm font-medium text-blue-600">#{invoice.maHD}</td>
-                      <td className="py-3 text-sm text-gray-800">{invoice.tenKH}</td>
-                      <td className="py-3 text-sm text-gray-600 font-mono">{invoice.bienSo}</td>
+                      <td className="py-3 text-sm font-medium text-blue-600">
+                        #{invoice.maHD}
+                      </td>
+                      <td className="py-3 text-sm text-gray-800">
+                        {invoice.tenKH}
+                      </td>
+                      <td className="py-3 text-sm text-gray-600 font-mono">
+                        {invoice.bienSo}
+                      </td>
                       <td className="py-3 text-sm font-semibold text-gray-800 text-right">
                         {formatCurrency(invoice.tongTien)}
                       </td>
@@ -289,28 +361,46 @@ export const AdminDashboard: React.FC = () => {
 
         {/* Top Services */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Dịch vụ phổ biến</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Dịch vụ phổ biến
+          </h3>
           <div className="space-y-4">
             {dashboardData.topDichVu && dashboardData.topDichVu.length > 0 ? (
               dashboardData.topDichVu.slice(0, 5).map((service, index) => (
-                <div key={service.maDV} className="flex items-center justify-between">
+                <div
+                  key={service.maDV}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white ${
-                      index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500' : 
-                      index === 1 ? 'bg-gradient-to-r from-gray-400 to-gray-500' : 
-                      index === 2 ? 'bg-gradient-to-r from-orange-400 to-orange-500' : 
-                      'bg-gradient-to-r from-blue-400 to-blue-500'
-                    }`}>
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center text-white ${
+                        index === 0
+                          ? 'bg-gradient-to-r from-yellow-400 to-yellow-500'
+                          : index === 1
+                            ? 'bg-gradient-to-r from-gray-400 to-gray-500'
+                            : index === 2
+                              ? 'bg-gradient-to-r from-orange-400 to-orange-500'
+                              : 'bg-gradient-to-r from-blue-400 to-blue-500'
+                      }`}
+                    >
                       <i className="fas fa-wrench"></i>
                     </div>
                     <div>
-                      <p className="font-medium text-gray-800">{service.tenDV}</p>
-                      <p className="text-sm text-gray-500">{service.soLanSuDung} lần sử dụng</p>
+                      <p className="font-medium text-gray-800">
+                        {service.tenDV}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {service.soLanSuDung} lần sử dụng
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-green-600">{formatCurrency(service.doanhThu)}</p>
-                    <p className="text-xs text-gray-500">{service.soLuong} dịch vụ</p>
+                    <p className="font-semibold text-green-600">
+                      {formatCurrency(service.doanhThu)}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {service.soLuong} dịch vụ
+                    </p>
                   </div>
                 </div>
               ))

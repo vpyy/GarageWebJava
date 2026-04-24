@@ -1,277 +1,311 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
-import { invoiceService } from '../../services/invoiceService';
-import { Invoice } from '../../types/invoice';
+import { apiService } from '../../services/api';
 import toast from 'react-hot-toast';
 
+interface OrderItem {
+  maSP: number;
+  tenSP: string;
+  soLuong: number;
+  donGia: number;
+  thanhTien: number;
+}
+
+interface Order {
+  maHD: number;
+  hoTen: string;
+  soDienThoai: string;
+  email: string;
+  diaChi: string;
+  ghiChu: string;
+  phuongThucThanhToan: string;
+  tongTien: number;
+  trangThai: string;
+  ngayTao: string;
+  sanPhams: OrderItem[];
+}
+
+const statusStyle = (s: string) => {
+  switch (s) {
+    case 'Chờ xác nhận': return { bg: '#fef9c3', color: '#a16207', icon: 'fa-clock' };
+    case 'Đang xử lý':   return { bg: '#dbeafe', color: '#1d4ed8', icon: 'fa-spinner' };
+    case 'Hoàn thành':   return { bg: '#dcfce7', color: '#15803d', icon: 'fa-check-circle' };
+    case 'Hủy':          return { bg: '#fee2e2', color: '#b91c1c', icon: 'fa-times-circle' };
+    default:             return { bg: '#f1f5f9', color: '#64748b', icon: 'fa-circle' };
+  }
+};
+
+const fmt = (n: number) =>
+  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n);
+
+const fmtDate = (d: string) =>
+  d ? new Date(d).toLocaleDateString('vi-VN', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  }) : '-';
+
 export const OrdersPage: React.FC = () => {
-  const [orders, setOrders] = useState<Invoice[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedOrder, setSelectedOrder] = useState<Invoice | null>(null);
-  const [showModal, setShowModal] = useState(false);
+  const [selected, setSelected] = useState<Order | null>(null);
   const user = useSelector((state: RootState) => state.auth.user);
 
-  useEffect(() => {
-    loadOrders();
-  }, []);
+  useEffect(() => { loadOrders(); }, []);
 
   const loadOrders = async () => {
     try {
       setLoading(true);
-      // Get all invoices and filter by current user's phone number
-      const allInvoices = await invoiceService.getAll();
-      // Filter orders for current user (assuming we can match by phone or email)
-      const userOrders = allInvoices.filter(invoice => 
-        invoice.khachHang?.sdt === user?.username || 
-        invoice.khachHang?.email === user?.username
-      );
-      setOrders(userOrders);
-    } catch (error) {
-      toast.error('Lỗi khi tải lịch sử đơn hàng');
-      console.error('Error loading orders:', error);
+      // Lấy đơn hàng của user hiện tại
+      const data = await apiService.get<Order[]>(`/don-hang/my-orders`);
+      setOrders(data);
+    } catch {
+      // Fallback: lấy tất cả và lọc theo email/username
+      try {
+        const all = await apiService.get<Order[]>('/don-hang');
+        const mine = all.filter(
+          (o: Order) =>
+            o.email === user?.email ||
+            o.email === user?.username ||
+            o.soDienThoai === user?.username
+        );
+        setOrders(mine);
+      } catch {
+        toast.error('Lỗi khi tải lịch sử đơn hàng');
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const viewOrderDetails = async (order: Invoice) => {
-    try {
-      const detailData = await invoiceService.getById(order.maHD);
-      setSelectedOrder(detailData);
-      setShowModal(true);
-    } catch (error) {
-      toast.error('Lỗi khi tải chi tiết đơn hàng');
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'chờ xác nhận':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'đang xử lý':
-        return 'bg-blue-100 text-blue-800';
-      case 'hoàn thành':
-        return 'bg-green-100 text-green-800';
-      case 'hủy':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(amount);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  if (loading) {
+  if (loading)
     return (
-      <div style={{ padding: '2rem', minHeight: '80vh' }}>
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
+      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="spinner-border text-primary" role="status" />
       </div>
     );
-  }
 
   return (
-    <div style={{ padding: '2rem', minHeight: '80vh' }}>
-      <div className="container mx-auto">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Lịch sử đơn hàng</h2>
-        
+    <div style={{ minHeight: '80vh', background: '#f8fafc', padding: '2rem 1rem' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+
+        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#1e293b', margin: 0 }}>
+              <i className="fas fa-shopping-bag me-2" style={{ color: '#0ea5e9' }} />
+              Lịch sử đơn hàng
+            </h2>
+            <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px' }}>
+              {orders.length} đơn hàng
+            </p>
+          </div>
+          <button
+            onClick={loadOrders}
+            style={{
+              padding: '8px 16px', background: 'white',
+              border: '1px solid #e5e7eb', borderRadius: '8px',
+              color: '#64748b', cursor: 'pointer', fontSize: '13px', fontWeight: 600,
+            }}
+          >
+            <i className="fas fa-sync-alt me-1" />Làm mới
+          </button>
+        </div>
+
         {orders.length === 0 ? (
-          <div className="text-center py-12">
-            <i className="fas fa-shopping-bag text-6xl text-gray-300 mb-4"></i>
-            <h3 className="text-xl text-gray-500 mb-2">Chưa có đơn hàng nào</h3>
-            <p className="text-gray-400">Hãy mua sắm để tạo đơn hàng đầu tiên của bạn!</p>
+          <div style={{ background: 'white', borderRadius: '16px', padding: '60px 20px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            <i className="fas fa-shopping-bag" style={{ fontSize: '48px', color: '#cbd5e1', marginBottom: '16px', display: 'block' }} />
+            <h3 style={{ color: '#64748b', marginBottom: '8px' }}>Chưa có đơn hàng nào</h3>
+            <p style={{ color: '#94a3b8', fontSize: '14px' }}>Hãy mua sắm để tạo đơn hàng đầu tiên!</p>
+            <a
+              href="/customer/products"
+              style={{
+                display: 'inline-block', marginTop: '16px', padding: '10px 24px',
+                background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+                color: 'white', borderRadius: '8px', textDecoration: 'none', fontWeight: 600,
+              }}
+            >
+              Mua sắm ngay
+            </a>
           </div>
         ) : (
-          <div className="space-y-4">
-            {orders.map((order) => (
-              <div key={order.maHD} className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      Đơn hàng #{order.maHD}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      Ngày đặt: {formatDate(order.ngayLap)}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(order.trangThai)}`}>
-                      {order.trangThai}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {orders.map(order => {
+              const st = statusStyle(order.trangThai);
+              return (
+                <div
+                  key={order.maHD}
+                  style={{
+                    background: 'white', borderRadius: '14px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    border: '1px solid #f1f5f9', overflow: 'hidden',
+                  }}
+                >
+                  {/* Header */}
+                  <div
+                    style={{
+                      padding: '14px 20px', background: '#f8fafc',
+                      borderBottom: '1px solid #f1f5f9',
+                      display: 'flex', justifyContent: 'space-between',
+                      alignItems: 'center', flexWrap: 'wrap', gap: '8px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{ fontWeight: 700, color: '#1e293b', fontSize: '15px' }}>
+                        Đơn hàng #{order.maHD}
+                      </span>
+                      <span style={{ fontSize: '13px', color: '#94a3b8' }}>
+                        <i className="fas fa-calendar me-1" />{fmtDate(order.ngayTao)}
+                      </span>
+                    </div>
+                    <span
+                      style={{
+                        padding: '5px 14px', borderRadius: '20px',
+                        fontSize: '12px', fontWeight: 700,
+                        background: st.bg, color: st.color,
+                      }}
+                    >
+                      <i className={`fas ${st.icon} me-1`} />{order.trangThai || 'Chờ xác nhận'}
                     </span>
-                    <p className="text-lg font-bold text-gray-900 mt-2">
-                      {formatCurrency(order.tongTien)}
-                    </p>
                   </div>
-                </div>
 
-                <div className="border-t pt-4">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm text-gray-600">
-                        Thanh toán: {order.hinhThucTT}
-                      </p>
-                      {order.xe && (
-                        <p className="text-sm text-gray-600">
-                          Xe: {order.xe.bienSo} - {order.xe.hangXe}
-                        </p>
-                      )}
+                  {/* Body */}
+                  <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                    <div style={{ display: 'flex', gap: '28px', flexWrap: 'wrap' }}>
+                      <div>
+                        <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 700, marginBottom: '3px' }}>KHÁCH HÀNG</div>
+                        <div style={{ fontSize: '14px', color: '#374151', fontWeight: 600 }}>{order.hoTen}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 700, marginBottom: '3px' }}>THANH TOÁN</div>
+                        <div style={{ fontSize: '14px', color: '#374151' }}>
+                          {order.phuongThucThanhToan === 'COD' ? '💵 Tiền mặt' : '🏦 Chuyển khoản'}
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 700, marginBottom: '3px' }}>SẢN PHẨM</div>
+                        <div style={{ fontSize: '14px', color: '#374151' }}>
+                          {order.sanPhams?.length || 0} sản phẩm
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 700, marginBottom: '3px' }}>TỔNG TIỀN</div>
+                        <div style={{ fontSize: '16px', fontWeight: 800, color: '#0ea5e9' }}>{fmt(order.tongTien)}</div>
+                      </div>
                     </div>
                     <button
-                      onClick={() => viewOrderDetails(order)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm"
+                      onClick={() => setSelected(order)}
+                      style={{
+                        padding: '8px 20px',
+                        background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+                        color: 'white', border: 'none', borderRadius: '8px',
+                        fontWeight: 600, cursor: 'pointer', fontSize: '13px',
+                      }}
                     >
-                      Xem chi tiết
+                      <i className="fas fa-eye me-1" />Chi tiết
                     </button>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Order Detail Modal */}
-        {showModal && selectedOrder && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-10 mx-auto p-5 border w-4/5 max-w-4xl shadow-lg rounded-md bg-white">
-              <div className="mt-3">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    Chi tiết đơn hàng #{selectedOrder.maHD}
-                  </h3>
-                  <button
-                    onClick={() => setShowModal(false)}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <i className="fas fa-times text-xl"></i>
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Thông tin đơn hàng</h4>
-                    <div className="space-y-1 text-sm">
-                      <p><span className="font-medium">Ngày đặt:</span> {formatDate(selectedOrder.ngayLap)}</p>
-                      <p><span className="font-medium">Trạng thái:</span> 
-                        <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedOrder.trangThai)}`}>
-                          {selectedOrder.trangThai}
-                        </span>
-                      </p>
-                      <p><span className="font-medium">Thanh toán:</span> {selectedOrder.hinhThucTT}</p>
-                    </div>
-                  </div>
-
-                  {selectedOrder.xe && (
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Thông tin xe</h4>
-                      <div className="space-y-1 text-sm">
-                        <p><span className="font-medium">Biển số:</span> {selectedOrder.xe.bienSo}</p>
-                        <p><span className="font-medium">Hãng xe:</span> {selectedOrder.xe.hangXe}</p>
-                        <p><span className="font-medium">Đời xe:</span> {selectedOrder.xe.doiXe}</p>
-                        <p><span className="font-medium">Màu xe:</span> {selectedOrder.xe.mauXe}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Services */}
-                {selectedOrder.chiTietDichVus && selectedOrder.chiTietDichVus.length > 0 && (
-                  <div className="mb-6">
-                    <h4 className="font-medium text-gray-900 mb-3">Dịch vụ đã sử dụng</h4>
-                    <div className="space-y-3">
-                      {selectedOrder.chiTietDichVus.map((item, index) => (
-                        <div key={index} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
-                          {item.dichVu?.hinhAnh && (
-                            <img
-                              src={item.dichVu.hinhAnh}
-                              alt={item.dichVu.tenDichVu}
-                              className="w-16 h-16 object-cover rounded"
-                            />
-                          )}
-                          <div className="flex-1">
-                            <h5 className="font-medium text-gray-900">{item.dichVu?.tenDichVu}</h5>
-                            <p className="text-sm text-gray-600">{item.dichVu?.moTa}</p>
-                            <p className="text-sm text-gray-500">Số lượng: {item.soLuong}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium text-gray-900">{formatCurrency(item.thanhTien)}</p>
-                            <p className="text-sm text-gray-500">{formatCurrency(item.donGia)} x {item.soLuong}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Products */}
-                {selectedOrder.chiTietSanPhams && selectedOrder.chiTietSanPhams.length > 0 && (
-                  <div className="mb-6">
-                    <h4 className="font-medium text-gray-900 mb-3">Sản phẩm đã mua</h4>
-                    <div className="space-y-3">
-                      {selectedOrder.chiTietSanPhams.map((item, index) => (
-                        <div key={index} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
-                          {item.sanPham?.hinhAnh && (
-                            <img
-                              src={item.sanPham.hinhAnh}
-                              alt={item.sanPham.tenSanPham}
-                              className="w-16 h-16 object-cover rounded"
-                            />
-                          )}
-                          <div className="flex-1">
-                            <h5 className="font-medium text-gray-900">{item.sanPham?.tenSanPham}</h5>
-                            <p className="text-sm text-gray-600">{item.sanPham?.moTa}</p>
-                            <p className="text-sm text-gray-500">Số lượng: {item.soLuong}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium text-gray-900">{formatCurrency(item.thanhTien)}</p>
-                            <p className="text-sm text-gray-500">{formatCurrency(item.donGia)} x {item.soLuong}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="border-t pt-4">
-                  <div className="flex justify-between items-center">
-                    <div></div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-gray-900">
-                        Tổng tiền: {formatCurrency(selectedOrder.tongTien)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-end mt-6">
-                  <button
-                    onClick={() => setShowModal(false)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
-                  >
-                    Đóng
-                  </button>
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         )}
       </div>
+
+      {/* Modal chi tiết */}
+      {selected && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
+          onClick={() => setSelected(null)}
+        >
+          <div
+            style={{ background: 'white', borderRadius: '20px', width: '100%', maxWidth: '680px', maxHeight: '88vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ padding: '20px 24px', background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)', borderRadius: '20px 20px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h3 style={{ margin: 0, color: 'white', fontWeight: 800, fontSize: '18px' }}>
+                  Chi tiết đơn hàng #{selected.maHD}
+                </h3>
+                <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.8)', fontSize: '13px' }}>
+                  {fmtDate(selected.ngayTao)}
+                </p>
+              </div>
+              <button onClick={() => setSelected(null)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', width: '36px', height: '36px', borderRadius: '50%', cursor: 'pointer', fontSize: '18px' }}>×</button>
+            </div>
+
+            <div style={{ padding: '24px' }}>
+              {/* Thông tin */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '16px' }}>
+                  <div style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 700, marginBottom: '10px' }}>THÔNG TIN GIAO HÀNG</div>
+                  {[
+                    { label: 'Họ tên', value: selected.hoTen },
+                    { label: 'SĐT', value: selected.soDienThoai },
+                    { label: 'Email', value: selected.email },
+                    { label: 'Địa chỉ', value: selected.diaChi },
+                  ].map(row => (
+                    <div key={row.label} style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '14px' }}>
+                      <span style={{ color: '#94a3b8', minWidth: '60px' }}>{row.label}:</span>
+                      <span style={{ color: '#374151', fontWeight: 500 }}>{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ background: '#f8fafc', borderRadius: '12px', padding: '16px' }}>
+                  <div style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 700, marginBottom: '10px' }}>THÔNG TIN ĐƠN HÀNG</div>
+                  {[
+                    { label: 'Mã ĐH', value: `#${selected.maHD}` },
+                    { label: 'Thanh toán', value: selected.phuongThucThanhToan },
+                    { label: 'Trạng thái', value: selected.trangThai || 'Chờ xác nhận' },
+                    { label: 'Ghi chú', value: selected.ghiChu || '—' },
+                  ].map(row => (
+                    <div key={row.label} style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '14px' }}>
+                      <span style={{ color: '#94a3b8', minWidth: '70px' }}>{row.label}:</span>
+                      <span style={{ color: '#374151', fontWeight: 500 }}>{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sản phẩm */}
+              {selected.sanPhams && selected.sanPhams.length > 0 && (
+                <div style={{ marginBottom: '20px' }}>
+                  <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: '12px', fontSize: '15px' }}>
+                    <i className="fas fa-box me-2" style={{ color: '#0ea5e9' }} />Sản phẩm đã đặt
+                  </div>
+                  <div style={{ border: '1px solid #f1f5f9', borderRadius: '10px', overflow: 'hidden' }}>
+                    {selected.sanPhams.map((item, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                          padding: '12px 16px',
+                          borderBottom: i < selected.sanPhams.length - 1 ? '1px solid #f1f5f9' : 'none',
+                          background: i % 2 === 0 ? 'white' : '#fafafa',
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 600, color: '#374151' }}>{item.tenSP || `Sản phẩm #${item.maSP}`}</div>
+                          <div style={{ fontSize: '13px', color: '#94a3b8' }}>
+                            {item.soLuong} × {fmt(item.donGia)}
+                          </div>
+                        </div>
+                        <div style={{ fontWeight: 800, color: '#0ea5e9' }}>{fmt(item.thanhTien || item.soLuong * item.donGia)}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Tổng */}
+              <div style={{ background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)', borderRadius: '12px', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #bae6fd' }}>
+                <span style={{ fontWeight: 700, color: '#0369a1', fontSize: '15px' }}>Tổng thanh toán</span>
+                <span style={{ fontWeight: 800, color: '#0ea5e9', fontSize: '22px' }}>{fmt(selected.tongTien)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
