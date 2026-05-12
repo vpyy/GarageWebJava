@@ -26,13 +26,32 @@ interface CartState {
   error: string | null;
 }
 
-// Get cart from localStorage only if user is authenticated
-const getInitialCart = () => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    return JSON.parse(localStorage.getItem('cart') || '[]');
+// Lưu cart theo username để không mất khi đăng xuất/đăng nhập lại
+const getCartKey = () => {
+  try {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      return `cart_${user.username || user.userId || 'guest'}`;
+    }
+  } catch {
+    // ignore
   }
-  return [];
+  return 'cart';
+};
+
+const getInitialCart = () => {
+  try {
+    const key = getCartKey();
+    return JSON.parse(localStorage.getItem(key) || '[]');
+  } catch {
+    return [];
+  }
+};
+
+const saveCart = (items: CartItem[]) => {
+  const key = getCartKey();
+  localStorage.setItem(key, JSON.stringify(items));
 };
 
 const initialState: CartState = {
@@ -100,7 +119,7 @@ const cartSlice = createSlice({
       state.total = totals.total;
       state.itemCount = totals.itemCount;
 
-      localStorage.setItem('cart', JSON.stringify(state.items));
+      saveCart(state.items);
     },
     removeFromCart: (state, action: PayloadAction<number>) => {
       state.items = state.items.filter(item => item.id !== action.payload);
@@ -109,7 +128,7 @@ const cartSlice = createSlice({
       state.total = totals.total;
       state.itemCount = totals.itemCount;
 
-      localStorage.setItem('cart', JSON.stringify(state.items));
+      saveCart(state.items);
     },
     updateQuantity: (
       state,
@@ -135,14 +154,14 @@ const cartSlice = createSlice({
       state.total = totals.total;
       state.itemCount = totals.itemCount;
 
-      localStorage.setItem('cart', JSON.stringify(state.items));
+      saveCart(state.items);
     },
     clearCart: state => {
       state.items = [];
       state.total = 0;
       state.itemCount = 0;
       state.error = null;
-      localStorage.removeItem('cart');
+      saveCart([]);
     },
     clearError: state => {
       state.error = null;
@@ -150,15 +169,14 @@ const cartSlice = createSlice({
     syncCartWithAuth: (state, action: PayloadAction<boolean>) => {
       const isAuthenticated = action.payload;
       if (!isAuthenticated) {
-        // Clear cart when user logs out
+        // Không xóa cart khi logout - chỉ clear state, data vẫn còn trong localStorage theo username
         state.items = [];
         state.total = 0;
         state.itemCount = 0;
         state.error = null;
-        localStorage.removeItem('cart');
       } else {
-        // Load cart when user logs in
-        const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        // Load cart của user này khi đăng nhập
+        const savedCart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
         state.items = savedCart;
         const totals = calculateTotals(savedCart);
         state.total = totals.total;

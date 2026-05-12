@@ -195,51 +195,103 @@ export const AdminDashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Revenue Chart */}
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-gray-800">
-              Doanh thu theo tháng
-            </h3>
+          <div className="flex justify-between items-center mb-2">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800">
+                Doanh thu theo tháng
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Tháng {thangHienTai}/{namHienTai}:{' '}
+                <span className="font-semibold text-blue-600">
+                  {formatCurrency(dashboardData.doanhThuThangNay)}
+                </span>
+                <span className="ml-2 text-gray-400">
+                  ({dashboardData.soHoaDonThangNay} hóa đơn)
+                </span>
+              </p>
+            </div>
             <span className="text-sm text-gray-500">Năm {namHienTai}</span>
           </div>
 
-          {dashboardData.doanhThuTheoThang &&
-          dashboardData.doanhThuTheoThang.length > 0 ? (
-            <div className="flex items-end justify-between h-64 gap-2">
-              {dashboardData.doanhThuTheoThang.map((item, index) => {
-                const maxDoanhThu = Math.max(
-                  ...dashboardData.doanhThuTheoThang.map(x => x.doanhThu)
-                );
-                const height =
-                  maxDoanhThu > 0 ? (item.doanhThu / maxDoanhThu) * 100 : 0;
-                const isCurrentMonth = item.thang === thangHienTai;
+          {/* Build full 12-month array, fill missing months with 0 */}
+          {(() => {
+            const fullYear = Array.from({ length: 12 }, (_, i) => {
+              const thang = i + 1;
+              const found = dashboardData.doanhThuTheoThang?.find(
+                x => x.thang === thang
+              );
+              return { thang, doanhThu: found?.doanhThu ?? 0 };
+            });
+            const maxDoanhThu = Math.max(...fullYear.map(x => x.doanhThu), 1);
 
-                return (
-                  <div
-                    key={index}
-                    className="flex flex-col items-center flex-1"
-                  >
+            return (
+              <div className="flex items-end justify-between gap-1 mt-4" style={{ height: '200px' }}>
+                {fullYear.map((item, index) => {
+                  const height = (item.doanhThu / maxDoanhThu) * 100;
+                  const isCurrentMonth = item.thang === thangHienTai;
+                  const hasData = item.doanhThu > 0;
+
+                  return (
                     <div
-                      className={`w-full rounded-t-lg transition-all hover:opacity-80 ${
-                        isCurrentMonth ? 'bg-blue-500' : 'bg-blue-200'
-                      }`}
-                      style={{ height: `${height}%`, minHeight: '8px' }}
-                      title={`Tháng ${item.thang}: ${formatCurrency(item.doanhThu)}`}
-                    ></div>
-                    <span className="text-xs text-gray-500 mt-2">
-                      T{item.thang}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-64 text-gray-500">
-              <div className="text-center">
-                <i className="fas fa-chart-line text-4xl mb-4"></i>
-                <p>Chưa có dữ liệu doanh thu</p>
+                      key={index}
+                      className="flex flex-col items-center flex-1"
+                      style={{ height: '100%', justifyContent: 'flex-end' }}
+                    >
+                      <div
+                        style={{
+                          width: '100%',
+                          height: `${Math.max(height, hasData ? 4 : 2)}%`,
+                          minHeight: hasData ? '6px' : '2px',
+                          borderRadius: '4px 4px 0 0',
+                          background: isCurrentMonth
+                            ? 'linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)'
+                            : hasData
+                              ? '#bfdbfe'
+                              : '#f1f5f9',
+                          transition: 'all 0.3s',
+                          cursor: hasData ? 'pointer' : 'default',
+                          boxShadow: isCurrentMonth
+                            ? '0 -2px 8px rgba(59,130,246,0.4)'
+                            : 'none',
+                        }}
+                        title={
+                          hasData
+                            ? `Tháng ${item.thang}: ${formatCurrency(item.doanhThu)}`
+                            : `Tháng ${item.thang}: Chưa có dữ liệu`
+                        }
+                      />
+                      <span
+                        className="text-xs mt-1"
+                        style={{
+                          color: isCurrentMonth ? '#2563eb' : '#9ca3af',
+                          fontWeight: isCurrentMonth ? 700 : 400,
+                          fontSize: '11px',
+                        }}
+                      >
+                        T{item.thang}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
+            );
+          })()}
+
+          {/* Legend */}
+          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100">
+            <div className="flex items-center gap-1.5">
+              <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: 'linear-gradient(180deg, #3b82f6, #1d4ed8)' }} />
+              <span className="text-xs text-gray-500">Tháng hiện tại</span>
             </div>
-          )}
+            <div className="flex items-center gap-1.5">
+              <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#bfdbfe' }} />
+              <span className="text-xs text-gray-500">Có doanh thu</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#f1f5f9' }} />
+              <span className="text-xs text-gray-500">Chưa có dữ liệu</span>
+            </div>
+          </div>
         </div>
 
         {/* Top Products */}

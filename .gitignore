@@ -2,14 +2,45 @@
 # GarageGo — Root .gitignore
 # ============================================================
 
-# Secrets — KHÔNG bao giờ commit
+# ── Secrets ─────────────────────────────────────────────────
 .env
 *.env.local
+*.env.production
 
-# OS
+# ── OS ──────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# IDE
+# ── IDE ─────────────────────────────────────────────────────
 .vscode/
 .idea/
+*.iml
+*.iws
+
+# ── Java / Maven ────────────────────────────────────────────
+GarageGo-BEJava/target/
+GarageGo-BEJava/.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+!GarageGo-BEJava/src/**
+
+# ── Node / React ────────────────────────────────────────────
+GarageGo-FE/node_modules/
+GarageGo-FE/build/
+GarageGo-FE/.env
+GarageGo-FE/.env.local
+GarageGo-FE/.env.production
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Docker ──────────────────────────────────────────────────
+# Không ignore docker-compose.yml (cần cho deployment)
+
+# ── Logs ────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Misc ────────────────────────────────────────────────────
+$null

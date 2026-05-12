@@ -1,6 +1,6 @@
 services:
   # ─────────────────────────────────────────────
-  # MySQL
+  # MySQL 8.0
   # ─────────────────────────────────────────────
   mysql:
     image: mysql:8.0
@@ -15,16 +15,20 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./GarageGoWeb.sql:/docker-entrypoint-initdb.d/init.sql
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+      - ./GarageGoWeb.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -u root -p123456 || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
 
   # ─────────────────────────────────────────────
-  # Redis
+  # Redis 7
   # ─────────────────────────────────────────────
   redis:
     image: redis:7-alpine
@@ -32,14 +36,15 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
-    command: redis-server --requirepass "" --maxmemory 256mb --maxmemory-policy allkeys-lru
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 3s
-      retries: 3
+      retries: 5
+      start_period: 10s
 
   # ─────────────────────────────────────────────
   # Spring Boot Backend
@@ -53,20 +58,31 @@ services:
     ports:
       - "5102:5102"
     environment:
+      # Kích hoạt Docker profile (application-docker.properties)
+      SPRING_PROFILES_ACTIVE: docker
+      # Database
       DB_PASSWORD: 123456
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/GaraOToManagement?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true
+      # JWT
       JWT_SECRET: bXlTZWNyZXRLZXlGb3JHYXJhZ2VHb0FwcGxpY2F0aW9u
+      # Redis
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ""
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/GaraOToManagement?useSSL=false&serverTimezone=Asia/Ho_Chi_Minh&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true
     depends_on:
       mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5102/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 
   # ─────────────────────────────────────────────
-  # React Frontend
+  # React Frontend (Nginx)
   # ─────────────────────────────────────────────
   frontend:
     build:

@@ -8,14 +8,11 @@ interface Service {
   maDV?: number;
   id?: number;
   tenDV?: string;
-  tenDichVu?: string;
   donGia?: number;
-  gia?: number;
   moTa: string;
   hinhAnh: string;
   trangThai: boolean;
 }
-
 interface BookingForm {
   tenKhachHang: string;
   soDienThoai: string;
@@ -25,6 +22,11 @@ interface BookingForm {
   ghiChu: string;
 }
 
+const fmt = (n: number) =>
+  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(
+    n
+  );
+
 const ServiceBookingPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ const ServiceBookingPage: React.FC = () => {
   const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
+  const [step, setStep] = useState(1); // 1: info, 2: confirm
   const [form, setForm] = useState<BookingForm>({
     tenKhachHang: '',
     soDienThoai: '',
@@ -43,47 +45,38 @@ const ServiceBookingPage: React.FC = () => {
   });
 
   useEffect(() => {
-    fetchService();
+    fetch(`/api/dich-vu/${id}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => {
+        if (d) setService(d);
+        else navigate('/customer/services');
+      })
+      .catch(() => navigate('/customer/services'))
+      .finally(() => setLoading(false));
   }, [id]);
-
-  const fetchService = async () => {
-    try {
-      const res = await fetch(`/api/dich-vu/${id}`);
-      if (res.ok) setService(await res.json());
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (step === 1) {
+      setStep(2);
+      return;
+    }
     setSubmitting(true);
     try {
-      const bookingData = {
-        tenKhachHang: form.tenKhachHang,
-        soDienThoai: form.soDienThoai,
-        diaChi: form.diaChi,
-        maDV: service?.maDV || service?.id || parseInt(id!),
-        ghiChu: form.ghiChu,
-        ngayHen: form.ngayHen,
-        gioHen: form.gioHen,
-        username: user?.username,
-      };
       const res = await fetch('/api/yeu-cau', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
         },
-        body: JSON.stringify(bookingData),
+        body: JSON.stringify({
+          ...form,
+          maDV: service?.maDV || service?.id || parseInt(id!),
+          username: user?.username,
+        }),
       });
       if (res.ok) {
-        setShowDialog(false);
-        toast.success(
-          'Đặt lịch thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.'
-        );
+        toast.success('Đặt lịch thành công! Chúng tôi sẽ liên hệ sớm nhất.');
         navigate('/customer/service-requests');
       } else {
         toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
@@ -95,26 +88,15 @@ const ServiceBookingPage: React.FC = () => {
     }
   };
 
-  const fmt = (n: number) =>
-    new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    }).format(n);
-  const inputStyle: React.CSSProperties = {
+  const inp: React.CSSProperties = {
     width: '100%',
-    padding: '8px 12px',
-    border: '1px solid #d1d5db',
-    borderRadius: '8px',
+    padding: '11px 14px',
+    border: '1.5px solid #e5e7eb',
+    borderRadius: '10px',
     fontSize: '14px',
     outline: 'none',
     boxSizing: 'border-box',
-  };
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '13px',
-    fontWeight: 600,
-    color: '#374151',
-    marginBottom: '4px',
+    transition: 'border-color 0.2s',
   };
 
   if (loading)
@@ -127,409 +109,476 @@ const ServiceBookingPage: React.FC = () => {
           justifyContent: 'center',
         }}
       >
-        <div className="spinner-border text-primary"></div>
+        <div style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              border: '3px solid #e2e8f0',
+              borderTopColor: '#0ea5e9',
+              borderRadius: '50%',
+              animation: 'spin 0.8s linear infinite',
+              margin: '0 auto 12px',
+            }}
+          />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          <div style={{ color: '#64748b', fontSize: '14px' }}>Đang tải...</div>
+        </div>
       </div>
     );
 
-  if (!service)
-    return (
-      <div style={{ textAlign: 'center', padding: '4rem' }}>
-        <h3>Không tìm thấy dịch vụ</h3>
-        <button
-          onClick={() => navigate('/customer/services')}
-          className="btn btn-primary mt-3"
-        >
-          Quay lại
-        </button>
-      </div>
-    );
+  if (!service) return null;
 
-  const tenDV = service.tenDV || service.tenDichVu || '';
-  const gia = service.donGia || service.gia || 0;
+  const name = service.tenDV || '';
+  const price = service.donGia || 0;
 
   return (
-    <div
-      style={{ minHeight: '80vh', background: '#f8fafc', padding: '2rem 1rem' }}
-    >
-      <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-        {/* Service card */}
+    <div style={{ background: '#f8fafc', minHeight: '100vh' }}>
+      <style>{`
+        .sb-hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); padding: 3rem 0 5rem; position: relative; overflow: hidden; }
+        .sb-hero::before { content: ''; position: absolute; inset: 0; background: url('${service.hinhAnh}') center/cover; opacity: 0.1; }
+        .sb-body { max-width: 900px; margin: -3rem auto 3rem; padding: 0 1.5rem; position: relative; z-index: 1; }
+        .sb-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+        .sb-card { background: white; border-radius: 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); overflow: hidden; }
+        .sb-card-head { padding: 18px 22px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; }
+        .sb-card-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+        .sb-step-num { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #0ea5e9, #06b6d4); color: white; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+        .sb-card-body { padding: 22px; }
+        .sb-field { margin-bottom: 16px; }
+        .sb-label { display: block; font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .sb-submit-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #0ea5e9, #06b6d4); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 6px 20px rgba(14,165,233,0.35); }
+        .sb-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(14,165,233,0.45); }
+        .sb-submit-btn:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; transform: none; }
+        .sb-back-btn { width: 100%; padding: 12px; background: white; color: #64748b; border: 1.5px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: all 0.2s; }
+        .sb-back-btn:hover { border-color: #0ea5e9; color: #0ea5e9; }
+
+        /* Service info card */
+        .sb-info-card { background: white; border-radius: 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); overflow: hidden; position: sticky; top: 88px; }
+        .sb-info-img { height: 180px; overflow: hidden; }
+        .sb-info-img img { width: 100%; height: 100%; object-fit: cover; }
+        .sb-info-body { padding: 18px; }
+        .sb-info-name { font-size: 16px; font-weight: 800; color: #1e293b; margin-bottom: 6px; }
+        .sb-info-desc { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .sb-info-price { font-size: 22px; font-weight: 900; color: #0ea5e9; margin-bottom: 14px; }
+        .sb-info-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b; margin-bottom: 8px; }
+        .sb-info-row i { width: 16px; color: #0ea5e9; }
+
+        /* Steps */
+        .sb-steps { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+        .sb-step { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
+        .sb-step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
+        .sb-step-line { flex: 1; height: 2px; background: #e2e8f0; }
+
+        /* Confirm */
+        .sb-confirm-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f8fafc; font-size: 14px; }
+        .sb-confirm-label { color: #94a3b8; font-weight: 500; }
+        .sb-confirm-val { color: #1e293b; font-weight: 600; text-align: right; max-width: 60%; }
+
+        @media (max-width: 700px) { .sb-grid { grid-template-columns: 1fr; } .sb-info-card { position: static; } }
+      `}</style>
+
+      {/* Hero */}
+      <div className="sb-hero">
         <div
           style={{
-            background: 'white',
-            borderRadius: '16px',
-            overflow: 'hidden',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-            marginBottom: '24px',
+            maxWidth: '900px',
+            margin: '0 auto',
+            padding: '0 1.5rem',
+            position: 'relative',
           }}
         >
-          <img
-            src={
-              service.hinhAnh ||
-              'https://images.pexels.com/photos/4489743/pexels-photo-4489743.jpeg'
-            }
-            alt={tenDV}
-            style={{ width: '100%', height: '220px', objectFit: 'cover' }}
-          />
-          <div style={{ padding: '20px 24px' }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                flexWrap: 'wrap',
-                gap: '12px',
-              }}
-            >
-              <div>
-                <h2
-                  style={{
-                    fontSize: '22px',
-                    fontWeight: 800,
-                    color: '#1e293b',
-                    margin: '0 0 8px',
-                  }}
-                >
-                  {tenDV}
-                </h2>
-                <p style={{ color: '#64748b', margin: 0, lineHeight: 1.6 }}>
-                  {service.moTa}
-                </p>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div
-                  style={{
-                    fontSize: '24px',
-                    fontWeight: 800,
-                    color: '#0ea5e9',
-                  }}
-                >
-                  {fmt(gia)}
-                </div>
-                <span
-                  style={{
-                    display: 'inline-block',
-                    padding: '4px 12px',
-                    borderRadius: '20px',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    background: service.trangThai ? '#dcfce7' : '#f1f5f9',
-                    color: service.trangThai ? '#15803d' : '#64748b',
-                  }}
-                >
-                  {service.trangThai ? '✓ Có sẵn' : 'Tạm ngưng'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Info + nút đặt lịch */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '16px',
-            marginBottom: '24px',
-          }}
-        >
-          {[
-            { icon: 'fa-phone', text: '038 442 4567' },
-            { icon: 'fa-envelope', text: 'contact@mtproauto.vn' },
-            {
-              icon: 'fa-map-marker-alt',
-              text: 'Ngã 4 An Dương Vương, Quảng Ngãi',
-            },
-            { icon: 'fa-clock', text: 'Thứ 2 - Thứ 7: 7:30 - 17:30' },
-          ].map((item, i) => (
-            <div
-              key={i}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                background: 'white',
-                padding: '14px 16px',
-                borderRadius: '10px',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
-              }}
-            >
-              <i
-                className={`fas ${item.icon}`}
-                style={{ color: '#0ea5e9', width: '18px' }}
-              ></i>
-              <span style={{ fontSize: '14px', color: '#374151' }}>
-                {item.text}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ display: 'flex', gap: '12px' }}>
           <button
             onClick={() => navigate('/customer/services')}
             style={{
-              flex: 1,
-              padding: '14px',
-              background: '#f1f5f9',
-              color: '#64748b',
-              border: 'none',
-              borderRadius: '10px',
-              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 14px',
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '8px',
+              color: 'rgba(255,255,255,0.8)',
               cursor: 'pointer',
-              fontSize: '15px',
+              fontSize: '13px',
+              marginBottom: '16px',
             }}
           >
-            <i className="fas fa-arrow-left me-2"></i>Quay lại
+            <i className="fas fa-arrow-left" />
+            Quay lại
           </button>
-          <button
-            onClick={() => setShowDialog(true)}
-            disabled={!service.trangThai}
+          <h1
             style={{
-              flex: 2,
-              padding: '14px',
-              background: service.trangThai
-                ? 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)'
-                : '#e5e7eb',
-              color: service.trangThai ? 'white' : '#94a3b8',
-              border: 'none',
-              borderRadius: '10px',
-              fontWeight: 700,
-              cursor: service.trangThai ? 'pointer' : 'not-allowed',
-              fontSize: '15px',
+              fontSize: '2rem',
+              fontWeight: 900,
+              color: 'white',
+              margin: '0 0 6px',
             }}
           >
-            <i className="fas fa-calendar-check me-2"></i>Đặt lịch ngay
-          </button>
+            Đặt lịch dịch vụ
+          </h1>
+          <p
+            style={{
+              color: 'rgba(255,255,255,0.65)',
+              fontSize: '14px',
+              margin: 0,
+            }}
+          >
+            {name}
+          </p>
         </div>
       </div>
 
-      {/* Dialog đặt lịch */}
-      {showDialog && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.5)',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '1rem',
-          }}
-          onClick={() => setShowDialog(false)}
-        >
-          <div
-            style={{
-              background: 'white',
-              borderRadius: '16px',
-              width: '100%',
-              maxWidth: '600px',
-              maxHeight: '90vh',
-              overflow: 'auto',
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div
-              style={{
-                padding: '20px 24px',
-                background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
-                borderRadius: '16px 16px 0 0',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <div>
-                <h3
-                  style={{
-                    margin: 0,
-                    color: 'white',
-                    fontWeight: 700,
-                    fontSize: '18px',
-                  }}
-                >
-                  <i className="fas fa-calendar-check me-2"></i>Đặt lịch dịch vụ
-                </h3>
+      <div className="sb-body">
+        {/* Steps indicator */}
+        <div className="sb-steps" style={{ marginBottom: '20px' }}>
+          {[
+            { n: 1, label: 'Thông tin' },
+            { n: 2, label: 'Xác nhận' },
+          ].map((s, i) => (
+            <React.Fragment key={s.n}>
+              <div className="sb-step">
                 <div
+                  className="sb-step-dot"
                   style={{
-                    color: 'rgba(255,255,255,0.8)',
-                    fontSize: '13px',
-                    marginTop: '4px',
-                  }}
-                >
-                  {tenDV} — {fmt(gia)}
-                </div>
-              </div>
-              <button
-                onClick={() => setShowDialog(false)}
-                style={{
-                  background: 'rgba(255,255,255,0.2)',
-                  border: 'none',
-                  color: 'white',
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                }}
-              >
-                ×
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
-              {/* Họ tên + SĐT */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '16px',
-                  marginBottom: '16px',
-                }}
-              >
-                <div>
-                  <label style={labelStyle}>Họ và tên *</label>
-                  <input
-                    style={inputStyle}
-                    type="text"
-                    value={form.tenKhachHang}
-                    onChange={e =>
-                      setForm({ ...form, tenKhachHang: e.target.value })
-                    }
-                    placeholder="Nguyễn Văn A"
-                    required
-                  />
-                </div>
-                <div>
-                  <label style={labelStyle}>Số điện thoại *</label>
-                  <input
-                    style={inputStyle}
-                    type="tel"
-                    value={form.soDienThoai}
-                    onChange={e =>
-                      setForm({ ...form, soDienThoai: e.target.value })
-                    }
-                    placeholder="0123456789"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Địa chỉ */}
-              <div style={{ marginBottom: '16px' }}>
-                <label style={labelStyle}>Địa chỉ *</label>
-                <textarea
-                  style={{ ...inputStyle, resize: 'none' }}
-                  rows={2}
-                  value={form.diaChi}
-                  onChange={e => setForm({ ...form, diaChi: e.target.value })}
-                  placeholder="Nhập địa chỉ của bạn"
-                  required
-                />
-              </div>
-
-              {/* Ngày + Giờ */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '16px',
-                  marginBottom: '16px',
-                }}
-              >
-                <div>
-                  <label style={labelStyle}>Ngày hẹn *</label>
-                  <input
-                    style={inputStyle}
-                    type="date"
-                    value={form.ngayHen}
-                    onChange={e =>
-                      setForm({ ...form, ngayHen: e.target.value })
-                    }
-                    min={new Date().toISOString().split('T')[0]}
-                    required
-                  />
-                </div>
-                <div>
-                  <label style={labelStyle}>Giờ hẹn *</label>
-                  <input
-                    style={inputStyle}
-                    type="time"
-                    value={form.gioHen}
-                    onChange={e => setForm({ ...form, gioHen: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Ghi chú */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={labelStyle}>
-                  Ghi chú về xe / yêu cầu đặc biệt
-                </label>
-                <textarea
-                  style={{ ...inputStyle, resize: 'none' }}
-                  rows={3}
-                  value={form.ghiChu}
-                  onChange={e => setForm({ ...form, ghiChu: e.target.value })}
-                  placeholder="Mô tả vấn đề của xe hoặc yêu cầu đặc biệt..."
-                />
-              </div>
-
-              {/* Nút */}
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '12px',
-                  justifyContent: 'flex-end',
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => setShowDialog(false)}
-                  style={{
-                    padding: '10px 20px',
-                    background: '#f1f5f9',
-                    color: '#64748b',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  style={{
-                    padding: '10px 24px',
                     background:
-                      'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
+                      step >= s.n
+                        ? 'linear-gradient(135deg, #0ea5e9, #06b6d4)'
+                        : '#e2e8f0',
+                    color: step >= s.n ? 'white' : '#94a3b8',
                   }}
                 >
-                  {submitting ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2"></span>
-                      Đang xử lý...
-                    </>
+                  {step > s.n ? (
+                    <i className="fas fa-check" style={{ fontSize: '10px' }} />
                   ) : (
-                    <>
-                      <i className="fas fa-check me-2"></i>Xác nhận đặt lịch
-                    </>
+                    s.n
                   )}
-                </button>
+                </div>
+                <span style={{ color: step >= s.n ? '#0ea5e9' : '#94a3b8' }}>
+                  {s.label}
+                </span>
               </div>
-            </form>
+              {i < 1 && (
+                <div
+                  className="sb-step-line"
+                  style={{ background: step > 1 ? '#0ea5e9' : '#e2e8f0' }}
+                />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+
+        <div className="sb-grid">
+          {/* Form */}
+          <form onSubmit={handleSubmit}>
+            {step === 1 ? (
+              <div className="sb-card">
+                <div className="sb-card-head">
+                  <div className="sb-step-num">1</div>
+                  <div className="sb-card-title">Thông tin đặt lịch</div>
+                </div>
+                <div className="sb-card-body">
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '16px',
+                    }}
+                  >
+                    <div className="sb-field">
+                      <label className="sb-label">
+                        Họ và tên <span style={{ color: '#ef4444' }}>*</span>
+                      </label>
+                      <input
+                        style={inp}
+                        type="text"
+                        value={form.tenKhachHang}
+                        onChange={e =>
+                          setForm({ ...form, tenKhachHang: e.target.value })
+                        }
+                        placeholder="Nguyễn Văn A"
+                        required
+                        onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                        onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
+                      />
+                    </div>
+                    <div className="sb-field">
+                      <label className="sb-label">
+                        Số điện thoại{' '}
+                        <span style={{ color: '#ef4444' }}>*</span>
+                      </label>
+                      <input
+                        style={inp}
+                        type="tel"
+                        value={form.soDienThoai}
+                        onChange={e =>
+                          setForm({ ...form, soDienThoai: e.target.value })
+                        }
+                        placeholder="0901 234 567"
+                        required
+                        onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                        onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
+                      />
+                    </div>
+                  </div>
+                  <div className="sb-field">
+                    <label className="sb-label">
+                      Địa chỉ <span style={{ color: '#ef4444' }}>*</span>
+                    </label>
+                    <textarea
+                      style={{ ...inp, resize: 'none' }}
+                      rows={2}
+                      value={form.diaChi}
+                      onChange={e =>
+                        setForm({ ...form, diaChi: e.target.value })
+                      }
+                      placeholder="Số nhà, tên đường, phường/xã..."
+                      required
+                      onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                      onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '16px',
+                    }}
+                  >
+                    <div className="sb-field">
+                      <label className="sb-label">
+                        Ngày hẹn <span style={{ color: '#ef4444' }}>*</span>
+                      </label>
+                      <input
+                        style={inp}
+                        type="date"
+                        value={form.ngayHen}
+                        onChange={e =>
+                          setForm({ ...form, ngayHen: e.target.value })
+                        }
+                        min={new Date().toISOString().split('T')[0]}
+                        required
+                        onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                        onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
+                      />
+                    </div>
+                    <div className="sb-field">
+                      <label className="sb-label">
+                        Giờ hẹn <span style={{ color: '#ef4444' }}>*</span>
+                      </label>
+                      <input
+                        style={inp}
+                        type="time"
+                        value={form.gioHen}
+                        onChange={e =>
+                          setForm({ ...form, gioHen: e.target.value })
+                        }
+                        required
+                        onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                        onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
+                      />
+                    </div>
+                  </div>
+                  <div className="sb-field" style={{ marginBottom: 0 }}>
+                    <label className="sb-label">
+                      Ghi chú về xe / yêu cầu đặc biệt
+                    </label>
+                    <textarea
+                      style={{ ...inp, resize: 'none' }}
+                      rows={3}
+                      value={form.ghiChu}
+                      onChange={e =>
+                        setForm({ ...form, ghiChu: e.target.value })
+                      }
+                      placeholder="Mô tả vấn đề của xe hoặc yêu cầu đặc biệt..."
+                      onFocus={e => (e.target.style.borderColor = '#0ea5e9')}
+                      onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
+                    />
+                  </div>
+                </div>
+                <div style={{ padding: '0 22px 22px' }}>
+                  <button type="submit" className="sb-submit-btn">
+                    Tiếp theo <i className="fas fa-arrow-right ms-2" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="sb-card">
+                <div className="sb-card-head">
+                  <div className="sb-step-num">2</div>
+                  <div className="sb-card-title">Xác nhận thông tin</div>
+                </div>
+                <div className="sb-card-body">
+                  <div
+                    style={{
+                      background: '#f0f9ff',
+                      borderRadius: '12px',
+                      padding: '16px',
+                      marginBottom: '16px',
+                      border: '1px solid #bae6fd',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: '#0369a1',
+                        marginBottom: '10px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      Thông tin đặt lịch
+                    </div>
+                    {[
+                      ['Dịch vụ', name],
+                      ['Họ và tên', form.tenKhachHang],
+                      ['Số điện thoại', form.soDienThoai],
+                      ['Địa chỉ', form.diaChi],
+                      ['Ngày hẹn', form.ngayHen],
+                      ['Giờ hẹn', form.gioHen],
+                      form.ghiChu ? ['Ghi chú', form.ghiChu] : null,
+                    ]
+                      .filter(Boolean)
+                      .map((row: any) => (
+                        <div key={row[0]} className="sb-confirm-row">
+                          <span className="sb-confirm-label">{row[0]}</span>
+                          <span className="sb-confirm-val">{row[1]}</span>
+                        </div>
+                      ))}
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        paddingTop: '12px',
+                        marginTop: '4px',
+                        borderTop: '2px solid #bae6fd',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          color: '#0369a1',
+                          fontSize: '15px',
+                        }}
+                      >
+                        Giá tham khảo
+                      </span>
+                      <span
+                        style={{
+                          fontWeight: 900,
+                          color: '#0ea5e9',
+                          fontSize: '20px',
+                        }}
+                      >
+                        {fmt(price)}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className="sb-submit-btn"
+                    disabled={submitting}
+                  >
+                    {submitting ? (
+                      <>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            width: '16px',
+                            height: '16px',
+                            border: '2px solid rgba(255,255,255,0.3)',
+                            borderTopColor: 'white',
+                            borderRadius: '50%',
+                            animation: 'spin 0.8s linear infinite',
+                            marginRight: '8px',
+                            verticalAlign: 'middle',
+                          }}
+                        />
+                        Đang xử lý...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-check-circle me-2" />
+                        Xác nhận đặt lịch
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="sb-back-btn"
+                    onClick={() => setStep(1)}
+                  >
+                    <i className="fas fa-arrow-left me-2" />
+                    Quay lại chỉnh sửa
+                  </button>
+                </div>
+              </div>
+            )}
+          </form>
+
+          {/* Service info */}
+          <div className="sb-info-card">
+            <div className="sb-info-img">
+              <img
+                src={
+                  service.hinhAnh ||
+                  'https://images.pexels.com/photos/4489743/pexels-photo-4489743.jpeg'
+                }
+                alt={name}
+              />
+            </div>
+            <div className="sb-info-body">
+              <div className="sb-info-name">{name}</div>
+              <div className="sb-info-desc">{service.moTa}</div>
+              <div className="sb-info-price">{fmt(price)}</div>
+              <div className="sb-info-row">
+                <i className="fas fa-phone-alt" />
+                038 442 4567
+              </div>
+              <div className="sb-info-row">
+                <i className="fas fa-map-marker-alt" />
+                Ngã 4 An Dương Vương, Quảng Ngãi
+              </div>
+              <div className="sb-info-row">
+                <i className="fas fa-clock" />
+                T2–T7: 7:30 – 17:30
+              </div>
+              <div
+                style={{
+                  marginTop: '14px',
+                  padding: '12px',
+                  background: '#f0fdf4',
+                  borderRadius: '10px',
+                }}
+              >
+                {[
+                  { icon: 'fa-shield-alt', text: 'Bảo hành dịch vụ' },
+                  {
+                    icon: 'fa-certificate',
+                    text: 'Kỹ thuật viên được chứng nhận',
+                  },
+                  { icon: 'fa-tag', text: 'Giá cả minh bạch' },
+                ].map(p => (
+                  <div
+                    key={p.icon}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '7px',
+                      fontSize: '12px',
+                      color: '#16a34a',
+                      marginBottom: '6px',
+                    }}
+                  >
+                    <i className={`fas ${p.icon}`} />
+                    {p.text}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -1,318 +1,379 @@
-# 🚗 GarageGo - Hệ thống Quản lý Garage Ô tô
+# 🚗 GarageGo — Hệ thống quản lý gara ô tô
 
-Hệ thống quản lý garage ô tô toàn diện với Spring Boot backend và React frontend.
+<div align="center">
 
-## 📋 Tính năng chính
+![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2-green?logo=springboot)
+![React](https://img.shields.io/badge/React-18-blue?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql)
+![Docker](https://img.shields.io/badge/Docker-Compose-blue?logo=docker)
 
-### 👨‍💼 Quản trị viên (Admin)
-- ✅ Quản lý sản phẩm (phụ tùng, phụ kiện)
-- ✅ Quản lý dịch vụ (sửa chữa, bảo dưỡng)
-- ✅ Quản lý khách hàng
-- ✅ Quản lý xe
-- ✅ Quản lý hóa đơn
-- ✅ Quản lý yêu cầu dịch vụ
-- ✅ Quản lý liên hệ
-- ✅ Thống kê doanh thu
-- ✅ Dashboard tổng quan
+**Ứng dụng quản lý gara ô tô full-stack với giao diện hiện đại, hỗ trợ đặt lịch dịch vụ, mua sắm phụ tùng và quản lý toàn diện.**
 
-### 👤 Khách hàng (Customer)
-- ✅ Đăng ký/Đăng nhập
-- ✅ Xem sản phẩm và dịch vụ
-- ✅ Đặt hàng online
-- ✅ Đặt lịch dịch vụ
-- ✅ Xem lịch sử đơn hàng
-- ✅ Quản lý thông tin cá nhân
-- ✅ Gửi liên hệ
+</div>
 
-## 🏗️ Kiến trúc hệ thống
+---
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Client Browser                        │
-│                   (React Frontend)                       │
-└────────────────────┬────────────────────────────────────┘
-                     │ HTTP/REST API
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│              Spring Boot Backend (Java 17)               │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  Controllers (REST API)                          │  │
-│  │  - AuthController, ProductController, etc.       │  │
-│  └────────────────┬─────────────────────────────────┘  │
-│                   │                                      │
-│  ┌────────────────▼─────────────────────────────────┐  │
-│  │  Services (Business Logic)                       │  │
-│  │  - JWT Authentication, CRUD Operations           │  │
-│  └────────────────┬─────────────────────────────────┘  │
-│                   │                                      │
-│  ┌────────────────▼─────────────────────────────────┐  │
-│  │  Repositories (Data Access)                      │  │
-│  │  - Spring Data JPA                               │  │
-│  └────────────────┬─────────────────────────────────┘  │
-└───────────────────┼──────────────────────────────────────┘
-                    │
-        ┌───────────┴───────────┐
-        ▼                       ▼
-┌───────────────┐       ┌───────────────┐
-│  MySQL 8.0    │       │  Redis 7      │
-│  (Database)   │       │  (Cache)      │
-└───────────────┘       └───────────────┘
-```
+## 📋 Mục lục
 
-## 🛠️ Tech Stack
+- [Tính năng](#-tính-năng)
+- [Công nghệ sử dụng](#-công-nghệ-sử-dụng)
+- [Cấu trúc dự án](#-cấu-trúc-dự-án)
+- [Chạy bằng Docker](#-chạy-bằng-docker-khuyến-nghị)
+- [Chạy local (không Docker)](#-chạy-local-không-docker)
+- [Tài khoản mặc định](#-tài-khoản-mặc-định)
+- [API Documentation](#-api-documentation)
+- [Cấu hình](#-cấu-hình)
 
-### Backend
-- **Framework**: Spring Boot 3.2.x
-- **Language**: Java 17
-- **Database**: MySQL 8.0
-- **Cache**: Redis 7
-- **Security**: Spring Security + JWT
-- **ORM**: Spring Data JPA (Hibernate)
-- **Build Tool**: Maven
-- **API Documentation**: Swagger/OpenAPI 3
+---
 
-### Frontend
-- **Framework**: React 18
-- **Language**: TypeScript
-- **Routing**: React Router v6
-- **State Management**: React Context API
-- **UI Components**: Custom components
-- **HTTP Client**: Fetch API
-- **Build Tool**: Create React App
+## ✨ Tính năng
 
-### DevOps
-- **Containerization**: Docker
-- **Orchestration**: Docker Compose
-- **Web Server**: Nginx (for frontend)
+### 👤 Khách hàng
+- Xem danh sách dịch vụ bảo dưỡng & sửa chữa
+- Đặt lịch dịch vụ trực tuyến (2-step form)
+- Mua sắm phụ tùng ô tô (giỏ hàng, chọn nhiều sản phẩm)
+- Theo dõi lịch sử đơn hàng & yêu cầu dịch vụ
+- Gửi liên hệ / tư vấn
+- Quản lý hồ sơ cá nhân
 
-## 🚀 Quick Start
+### 🔧 Quản trị viên
+- Dashboard thống kê doanh thu theo tháng
+- Quản lý khách hàng, xe, dịch vụ, sản phẩm
+- Quản lý hóa đơn, yêu cầu dịch vụ
+- Xử lý liên hệ từ khách hàng
+- Báo cáo & thống kê chi tiết
 
-### Cách 1: Docker Compose (Khuyến nghị)
+### 🔐 Bảo mật
+- JWT Authentication (Access Token 24h + Refresh Token 7 ngày)
+- BCrypt password hashing
+- Role-based access control (Admin / Customer)
+- CORS configuration
 
-```bash
-# 1. Clone repository
-git clone <repo-url>
-cd GarageGo
+---
 
-# 2. Copy environment file
-cp .env.example .env
+## 🛠 Công nghệ sử dụng
 
-# 3. Start all services
-docker compose up -d --build
+| Layer | Công nghệ |
+|-------|-----------|
+| **Backend** | Java 17, Spring Boot 3.2, Spring Security, Spring Data JPA |
+| **Frontend** | React 18, TypeScript, Redux Toolkit, Tailwind CSS |
+| **Database** | MySQL 8.0 (UTF-8mb4) |
+| **Cache** | Redis 7 (Docker) / Simple Cache (local) |
+| **Auth** | JWT (jjwt 0.12.3) |
+| **API Docs** | SpringDoc OpenAPI / Swagger UI |
+| **Container** | Docker, Docker Compose, Nginx |
+| **Build** | Maven 3.9, Node.js 18 |
 
-# 4. Access application
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:5102/api
-# Swagger: http://localhost:5102/swagger-ui.html
-```
-
-📖 **Chi tiết:** Xem [DOCKER_SETUP_GUIDE.md](./DOCKER_SETUP_GUIDE.md)
-
-### Cách 2: Local Development
-
-#### Prerequisites
-- Java 17+
-- Node.js 18+
-- MySQL 8.0
-- Redis 7
-- Maven 3.9+
-
-#### Backend Setup
-```bash
-cd GarageGo-BEJava
-
-# Configure database in application.properties
-# spring.datasource.url=jdbc:mysql://localhost:3306/GaraOToManagement
-# spring.datasource.password=your_password
-
-# Run application
-mvn spring-boot:run
-```
-
-#### Frontend Setup
-```bash
-cd GarageGo-FE
-
-# Install dependencies
-npm install --legacy-peer-deps
-
-# Start development server
-npm start
-```
+---
 
 ## 📁 Cấu trúc dự án
 
 ```
-GarageGo/
-├── GarageGo-BEJava/              # Spring Boot Backend
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/garagego/
-│   │   │   │   ├── config/       # Configuration classes
-│   │   │   │   ├── controller/   # REST Controllers
-│   │   │   │   ├── dto/          # Data Transfer Objects
-│   │   │   │   ├── exception/    # Exception handlers
-│   │   │   │   ├── model/        # JPA Entities
-│   │   │   │   ├── repository/   # Spring Data Repositories
-│   │   │   │   ├── security/     # Security components
-│   │   │   │   └── service/      # Business logic
-│   │   │   └── resources/
-│   │   │       └── application.properties
-│   │   └── test/
+GarageGoWeb/
+├── docker-compose.yml          # Orchestration toàn bộ services
+├── GarageGoWeb.sql             # Database schema + seed data
+├── .env.example                # Template biến môi trường
+│
+├── GarageGo-BEJava/            # Spring Boot Backend
 │   ├── Dockerfile
 │   ├── pom.xml
-│   ├── MIGRATION_NOTES.md        # API migration guide
-│   └── SPRING_BOOT_STANDARDS.md  # Best practices
+│   └── src/main/java/com/garagego/
+│       ├── config/             # Security, Redis, CORS
+│       ├── controller/         # REST API endpoints
+│       ├── service/            # Business logic
+│       ├── repository/         # JPA repositories
+│       ├── model/              # JPA entities
+│       ├── dto/                # Request/Response DTOs
+│       ├── security/           # JWT filter, UserDetails
+│       └── util/               # JWT utility
 │
-├── GarageGo-FE/                  # React Frontend
-│   ├── public/
-│   ├── src/
-│   │   ├── components/           # React components
-│   │   ├── contexts/             # Context providers
-│   │   ├── pages/                # Page components
-│   │   ├── services/             # API services
-│   │   └── App.tsx
-│   ├── Dockerfile
-│   ├── nginx.conf
-│   └── package.json
-│
-├── docker-compose.yml            # Production compose
-├── docker-compose.dev.yml        # Development compose
-├── .env.example                  # Environment template
-├── GarageGoWeb.sql              # Database schema
-├── DOCKER_SETUP_GUIDE.md        # Docker guide
-└── README.md                     # This file
+└── GarageGo-FE/                # React Frontend
+    ├── Dockerfile
+    ├── nginx.conf              # Nginx proxy config
+    └── src/
+        ├── pages/
+        │   ├── admin/          # Dashboard, quản lý
+        │   ├── customer/       # Trang khách hàng
+        │   └── auth/           # Login, Register
+        ├── components/
+        │   ├── layouts/        # PublicLayout, AdminLayout
+        │   └── admin/          # Sidebar, Header
+        ├── store/              # Redux store + slices
+        ├── services/           # API service calls
+        └── types/              # TypeScript interfaces
 ```
-
-## 🔐 Authentication & Authorization
-
-### JWT Authentication
-- **Access Token**: 24 giờ
-- **Refresh Token**: 7 ngày
-- **Token Rotation**: Refresh token được rotate khi sử dụng
-
-### Roles
-- **ADMIN**: Full access
-- **CUSTOMER**: Limited access (own data only)
-
-### Protected Endpoints
-```
-/api/auth/login          → Public
-/api/auth/register       → Public
-/api/san-pham/**         → GET: Public, POST/PUT/DELETE: ADMIN
-/api/dich-vu/**          → GET: Public, POST/PUT/DELETE: ADMIN
-/api/thong-ke/**         → ADMIN only
-/api/hoa-don/**          → ADMIN only
-/api/khach-hang/**       → ADMIN only
-```
-
-## 📊 Database Schema
-
-### Main Tables
-- `Users` - User accounts
-- `RefreshTokens` - JWT refresh tokens
-- `KhachHang` - Customers
-- `Xe` - Vehicles
-- `SanPham` - Products
-- `DichVu` - Services
-- `HoaDon` - Invoices
-- `ChiTietHDSP` - Invoice product details
-- `ChiTietHDDV` - Invoice service details
-- `YeucauDichVu` - Service requests
-- `LienHe` - Contact messages
-
-## 🔄 API Endpoints
-
-### Authentication
-```
-POST   /api/auth/login           # Login
-POST   /api/auth/register        # Register
-POST   /api/auth/refresh         # Refresh token
-POST   /api/auth/logout          # Logout
-GET    /api/auth/me              # Get current user
-```
-
-### Products (Sản phẩm)
-```
-GET    /api/san-pham             # Get all products
-GET    /api/san-pham/{id}        # Get product by ID
-GET    /api/san-pham/in-stock    # Get in-stock products
-GET    /api/san-pham/search?q=   # Search products
-POST   /api/san-pham             # Create product (ADMIN)
-PUT    /api/san-pham/{id}        # Update product (ADMIN)
-DELETE /api/san-pham/{id}        # Delete product (ADMIN)
-```
-
-### Services (Dịch vụ)
-```
-GET    /api/dich-vu              # Get all services
-GET    /api/dich-vu/{id}         # Get service by ID
-GET    /api/dich-vu/active       # Get active services
-POST   /api/dich-vu              # Create service (ADMIN)
-PUT    /api/dich-vu/{id}         # Update service (ADMIN)
-DELETE /api/dich-vu/{id}         # Delete service (ADMIN)
-```
-
-### Statistics (Thống kê)
-```
-GET    /api/thong-ke/dashboard           # Dashboard data
-GET    /api/thong-ke/doanh-thu-theo-ngay # Revenue by date
-GET    /api/thong-ke/top-san-pham        # Top products
-GET    /api/thong-ke/top-dich-vu         # Top services
-```
-
-📖 **Full API Documentation**: http://localhost:5102/swagger-ui.html
-
-## 🧪 Testing
-
-### Backend Tests
-```bash
-cd GarageGo-BEJava
-mvn test
-```
-
-### Frontend Tests
-```bash
-cd GarageGo-FE
-npm test
-```
-
-## 📝 Recent Changes
-
-### ✨ Spring Boot Standardization (Latest)
-- ✅ Đổi endpoint URLs từ PascalCase → kebab-case
-- ✅ Loại bỏ `Map<String, Object>` responses → Typed DTOs
-- ✅ Cải thiện error handling với GlobalExceptionHandler
-- ✅ Thêm validation cho request DTOs
-- ✅ Chuẩn hóa date handling với `@DateTimeFormat`
-- ✅ Xóa duplicate endpoints
-
-📖 **Chi tiết:** Xem [MIGRATION_NOTES.md](./GarageGo-BEJava/MIGRATION_NOTES.md)
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 👥 Team
-
-- Backend Developer: [Your Name]
-- Frontend Developer: [Your Name]
-- DevOps: [Your Name]
-
-## 📞 Support
-
-- Email: support@garagego.com
-- Documentation: [Wiki](./wiki)
-- Issues: [GitHub Issues](./issues)
 
 ---
 
-Made with ❤️ by GarageGo Team
+## 🐳 Chạy bằng Docker (Khuyến nghị)
+
+### Yêu cầu
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) ≥ 24.0
+- Docker Compose ≥ 2.0
+
+### Các bước
+
+**1. Clone repository**
+```bash
+git clone https://github.com/vpyy/GarageWebJava.git
+cd GarageWebJava
+```
+
+**2. Khởi động toàn bộ hệ thống**
+```bash
+docker compose up -d
+```
+
+> Lần đầu chạy sẽ mất 3–5 phút để build images và khởi tạo database.
+
+**3. Kiểm tra trạng thái**
+```bash
+docker compose ps
+```
+
+Kết quả mong đợi:
+```
+NAME                 STATUS
+garagego-mysql       Up (healthy)
+garagego-redis       Up (healthy)
+garagego-backend     Up
+garagego-frontend    Up
+```
+
+**4. Mở trình duyệt**
+
+| Service | URL |
+|---------|-----|
+| 🌐 Frontend | http://localhost:3000 |
+| ⚙️ Backend API | http://localhost:5102/api |
+| 📖 Swagger UI | http://localhost:5102/swagger-ui.html |
+| 🗄️ MySQL | localhost:3307 |
+
+### Dừng hệ thống
+```bash
+docker compose down
+```
+
+### Dừng và xóa toàn bộ dữ liệu
+```bash
+docker compose down -v
+```
+
+### Rebuild sau khi thay đổi code
+```bash
+# Rebuild tất cả
+docker compose up -d --build
+
+# Rebuild chỉ backend
+docker compose up -d --build backend
+
+# Rebuild chỉ frontend
+docker compose up -d --build frontend
+```
+
+### Xem logs
+```bash
+# Tất cả services
+docker compose logs -f
+
+# Chỉ backend
+docker compose logs -f backend
+
+# Chỉ frontend
+docker compose logs -f frontend
+```
+
+---
+
+## 💻 Chạy local (không Docker)
+
+Dùng khi cần debug hoặc phát triển tính năng mới.
+
+### Yêu cầu
+- Java 17+
+- Maven 3.9+
+- Node.js 18+
+- MySQL 8.0 (local hoặc XAMPP)
+
+### Bước 1: Setup MySQL
+
+Mở MySQL Workbench hoặc command line:
+```bash
+mysql -u root -p < GarageGoWeb.sql
+```
+
+Hoặc trong MySQL Workbench: **File → Open SQL Script → GarageGoWeb.sql → Execute**
+
+### Bước 2: Chạy Backend (IntelliJ IDEA)
+
+1. Mở IntelliJ IDEA → **File → Open** → chọn folder `GarageGo-BEJava`
+2. Đợi Maven import dependencies
+3. Click **Run** ▶️ hoặc `Shift+F10`
+
+Hoặc dùng Maven:
+```bash
+cd GarageGo-BEJava
+mvn spring-boot:run
+```
+
+> Backend chạy tại: http://localhost:5102
+
+### Bước 3: Chạy Frontend (CMD/Terminal)
+
+```bash
+cd GarageGo-FE
+npm install
+npm start
+```
+
+> Frontend chạy tại: http://localhost:3000
+
+### Lưu ý khi chạy local
+
+`application.properties` đã được cấu hình sẵn cho local:
+- Database: `localhost:3306`
+- Cache: Simple in-memory (không cần Redis)
+
+---
+
+## 🔑 Tài khoản mặc định
+
+| Vai trò | Username | Password | Giao diện |
+|---------|----------|----------|-----------|
+| **Admin** | `admin` | `123456` | `/admin/dashboard` |
+| **Customer** | `customer` | `123456` | `/customer/home` |
+
+---
+
+## 📡 API Documentation
+
+Swagger UI: http://localhost:5102/swagger-ui.html
+
+### Các endpoint chính
+
+| Method | Endpoint | Mô tả | Auth |
+|--------|----------|-------|------|
+| POST | `/api/auth/login` | Đăng nhập | Public |
+| POST | `/api/auth/register` | Đăng ký | Public |
+| POST | `/api/auth/refresh` | Refresh token | Public |
+| GET | `/api/dich-vu` | Danh sách dịch vụ | Public |
+| GET | `/api/san-pham` | Danh sách sản phẩm | Public |
+| POST | `/api/yeu-cau` | Đặt lịch dịch vụ | Customer/Admin |
+| POST | `/api/don-hang` | Tạo đơn hàng | Customer/Admin |
+| GET | `/api/don-hang/my-orders` | Đơn hàng của tôi | Customer/Admin |
+| GET | `/api/thong-ke/dashboard` | Dashboard thống kê | Admin |
+| POST | `/api/lien-he` | Gửi liên hệ | Public |
+
+---
+
+## ⚙️ Cấu hình
+
+### Biến môi trường Docker
+
+| Biến | Mặc định | Mô tả |
+|------|----------|-------|
+| `DB_PASSWORD` | `123456` | Mật khẩu MySQL |
+| `JWT_SECRET` | *(base64)* | Secret key cho JWT |
+| `REDIS_HOST` | `redis` | Host Redis |
+| `REDIS_PORT` | `6379` | Port Redis |
+| `SPRING_PROFILES_ACTIVE` | `docker` | Spring profile |
+
+### Ports
+
+| Service | Container Port | Host Port |
+|---------|---------------|-----------|
+| Frontend (Nginx) | 80 | 3000 |
+| Backend (Spring Boot) | 5102 | 5102 |
+| MySQL | 3306 | 3307 |
+| Redis | 6379 | 6379 |
+
+### Spring Profiles
+
+| Profile | Dùng khi | Database | Cache |
+|---------|----------|----------|-------|
+| `default` | Local development | `localhost:3306` | Simple (in-memory) |
+| `docker` | Docker container | `mysql:3306` | Redis |
+
+---
+
+## 🗄️ Database
+
+Schema được khởi tạo tự động từ `GarageGoWeb.sql` khi chạy Docker lần đầu.
+
+### Các bảng chính
+
+```
+USERS           — Tài khoản người dùng
+KHACHHANG       — Thông tin khách hàng
+XE              — Xe của khách hàng
+DICHVU          — Danh mục dịch vụ
+SANPHAM         — Danh mục sản phẩm
+YEUCAU_DICHVU   — Yêu cầu đặt lịch dịch vụ
+HOADON          — Hóa đơn
+CHITIET_HDDV    — Chi tiết hóa đơn dịch vụ
+CHITIET_HDSP    — Chi tiết hóa đơn sản phẩm
+LIENHE          — Liên hệ từ khách hàng
+```
+
+### Reset database
+
+```bash
+# Xóa volume MySQL và khởi động lại
+docker compose down -v
+docker compose up -d
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### Backend không kết nối được MySQL
+
+```bash
+# Kiểm tra MySQL đã healthy chưa
+docker compose ps mysql
+
+# Xem logs MySQL
+docker compose logs mysql
+```
+
+### Frontend không gọi được API
+
+Kiểm tra nginx.conf đã proxy đúng chưa:
+```nginx
+location /api/ {
+    proxy_pass http://backend:5102/api/;
+}
+```
+
+### Lỗi 403 sau khi đăng nhập
+
+Xóa localStorage trong browser:
+```javascript
+// F12 → Console
+localStorage.clear(); location.reload();
+```
+
+### Dữ liệu tiếng Việt bị lỗi encoding
+
+```bash
+# Xóa database và khởi tạo lại
+docker exec garagego-mysql mysql -u root -p123456 -e "DROP DATABASE GaraOToManagement;"
+docker cp GarageGoWeb.sql garagego-mysql:/tmp/init.sql
+docker exec garagego-mysql mysql -u root -p123456 --default-character-set=utf8mb4 < /tmp/init.sql
+docker compose restart backend
+```
+
+---
+
+## 📝 License
+
+MIT License — Tự do sử dụng cho mục đích học tập và phát triển.
+
+---
+
+<div align="center">
+Made with ❤️ by <strong>GarageGo Team</strong>
+</div>
