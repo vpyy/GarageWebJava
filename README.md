@@ -15,7 +15,7 @@
 
 ---
 
-## 📝 TÓM TẮT DỰ ÁN 
+## 📝 DỰ ÁN
 
 ### **GarageGo - Hệ thống quản lý gara ô tô Full-Stack**
 
