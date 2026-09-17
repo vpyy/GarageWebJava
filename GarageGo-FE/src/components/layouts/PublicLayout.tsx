@@ -16,7 +16,9 @@ export const PublicLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
   const { itemCount } = useSelector((state: RootState) => state.cart);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -42,7 +44,15 @@ export const PublicLayout: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", margin: 0, padding: 0, background: '#f8fafc' }}>
+    <div
+      style={{
+        fontFamily:
+          "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        margin: 0,
+        padding: 0,
+        background: '#f8fafc',
+      }}
+    >
       <style>{`
         * { box-sizing: border-box; }
 
@@ -292,7 +302,10 @@ export const PublicLayout: React.FC = () => {
                   to={link.to}
                   className={`pl-nav-link ${isActive(link.to) ? 'active' : ''}`}
                 >
-                  <i className={`fas ${link.icon}`} style={{ fontSize: '13px' }} />
+                  <i
+                    className={`fas ${link.icon}`}
+                    style={{ fontSize: '13px' }}
+                  />
                   {link.label}
                 </Link>
               </li>
@@ -304,39 +317,85 @@ export const PublicLayout: React.FC = () => {
             {/* Cart */}
             <Link to="/customer/cart" className="pl-cart-btn">
               <i className="fas fa-shopping-cart" />
-              {itemCount > 0 && <span className="pl-cart-badge">{itemCount > 9 ? '9+' : itemCount}</span>}
+              {itemCount > 0 && (
+                <span className="pl-cart-badge">
+                  {itemCount > 9 ? '9+' : itemCount}
+                </span>
+              )}
             </Link>
 
             {/* User */}
             {isAuthenticated && user ? (
               <div className="pl-user-wrap">
-                <button className="pl-user-btn" onClick={() => setUserMenuOpen(v => !v)}>
-                  <div className="pl-avatar">{user.username?.charAt(0).toUpperCase()}</div>
+                <button
+                  className="pl-user-btn"
+                  onClick={() => setUserMenuOpen(v => !v)}
+                >
+                  <div className="pl-avatar">
+                    {user.username?.charAt(0).toUpperCase()}
+                  </div>
                   <span className="pl-username">{user.username}</span>
-                  <i className="fas fa-chevron-down" style={{ fontSize: '10px', color: '#94a3b8' }} />
+                  <i
+                    className="fas fa-chevron-down"
+                    style={{ fontSize: '10px', color: '#94a3b8' }}
+                  />
                 </button>
                 {userMenuOpen && (
                   <div className="pl-dropdown">
                     <div className="pl-dropdown-header">
-                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b' }}>{user.username}</div>
-                      <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>{user.email || 'Khách hàng'}</div>
+                      <div
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: 700,
+                          color: '#1e293b',
+                        }}
+                      >
+                        {user.username}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          color: '#64748b',
+                          marginTop: '2px',
+                        }}
+                      >
+                        {user.email || 'Khách hàng'}
+                      </div>
                     </div>
                     <div style={{ padding: '6px 0' }}>
                       <Link to="/customer/profile" className="pl-dropdown-item">
-                        <i className="fas fa-user-circle" style={{ color: '#0ea5e9', width: '16px' }} />
+                        <i
+                          className="fas fa-user-circle"
+                          style={{ color: '#0ea5e9', width: '16px' }}
+                        />
                         Thông tin tài khoản
                       </Link>
                       <Link to="/customer/orders" className="pl-dropdown-item">
-                        <i className="fas fa-shopping-bag" style={{ color: '#8b5cf6', width: '16px' }} />
+                        <i
+                          className="fas fa-shopping-bag"
+                          style={{ color: '#8b5cf6', width: '16px' }}
+                        />
                         Lịch sử đơn hàng
                       </Link>
-                      <Link to="/customer/service-requests" className="pl-dropdown-item">
-                        <i className="fas fa-clipboard-list" style={{ color: '#f59e0b', width: '16px' }} />
+                      <Link
+                        to="/customer/service-requests"
+                        className="pl-dropdown-item"
+                      >
+                        <i
+                          className="fas fa-clipboard-list"
+                          style={{ color: '#f59e0b', width: '16px' }}
+                        />
                         Lịch sử dịch vụ
                       </Link>
                       <div className="pl-dropdown-divider" />
-                      <button className="pl-dropdown-item danger" onClick={handleLogout}>
-                        <i className="fas fa-sign-out-alt" style={{ width: '16px' }} />
+                      <button
+                        className="pl-dropdown-item danger"
+                        onClick={handleLogout}
+                      >
+                        <i
+                          className="fas fa-sign-out-alt"
+                          style={{ width: '16px' }}
+                        />
                         Đăng xuất
                       </button>
                     </div>
@@ -352,39 +411,89 @@ export const PublicLayout: React.FC = () => {
           </div>
 
           {/* Hamburger */}
-          <button className="pl-hamburger" onClick={() => setMobileOpen(v => !v)}>
+          <button
+            className="pl-hamburger"
+            onClick={() => setMobileOpen(v => !v)}
+          >
             <i className={`fas ${mobileOpen ? 'fa-times' : 'fa-bars'}`} />
           </button>
         </div>
       </nav>
 
       {/* Mobile menu */}
-      <div className={`pl-mobile-menu ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)}>
+      <div
+        className={`pl-mobile-menu ${mobileOpen ? 'open' : ''}`}
+        onClick={() => setMobileOpen(false)}
+      >
         <div className="pl-mobile-panel" onClick={e => e.stopPropagation()}>
           {NAV_LINKS.map(link => (
-            <Link key={link.to} to={link.to} className={`pl-mobile-link ${isActive(link.to) ? 'active' : ''}`}>
-              <i className={`fas ${link.icon}`} style={{ width: '18px', color: '#0ea5e9' }} />
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`pl-mobile-link ${isActive(link.to) ? 'active' : ''}`}
+            >
+              <i
+                className={`fas ${link.icon}`}
+                style={{ width: '18px', color: '#0ea5e9' }}
+              />
               {link.label}
             </Link>
           ))}
-          <div style={{ height: '1px', background: '#f1f5f9', margin: '8px 0' }} />
+          <div
+            style={{ height: '1px', background: '#f1f5f9', margin: '8px 0' }}
+          />
           <Link to="/customer/cart" className="pl-mobile-link">
-            <i className="fas fa-shopping-cart" style={{ width: '18px', color: '#0ea5e9' }} />
-            Giỏ hàng {itemCount > 0 && <span style={{ background: '#ef4444', color: 'white', borderRadius: '10px', padding: '1px 7px', fontSize: '11px', fontWeight: 700 }}>{itemCount}</span>}
+            <i
+              className="fas fa-shopping-cart"
+              style={{ width: '18px', color: '#0ea5e9' }}
+            />
+            Giỏ hàng{' '}
+            {itemCount > 0 && (
+              <span
+                style={{
+                  background: '#ef4444',
+                  color: 'white',
+                  borderRadius: '10px',
+                  padding: '1px 7px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                }}
+              >
+                {itemCount}
+              </span>
+            )}
           </Link>
           {isAuthenticated ? (
             <>
               <Link to="/customer/profile" className="pl-mobile-link">
-                <i className="fas fa-user" style={{ width: '18px', color: '#0ea5e9' }} />
+                <i
+                  className="fas fa-user"
+                  style={{ width: '18px', color: '#0ea5e9' }}
+                />
                 Tài khoản
               </Link>
-              <button className="pl-mobile-link" style={{ border: 'none', background: 'none', color: '#ef4444', cursor: 'pointer', width: '100%', textAlign: 'left' }} onClick={handleLogout}>
+              <button
+                className="pl-mobile-link"
+                style={{
+                  border: 'none',
+                  background: 'none',
+                  color: '#ef4444',
+                  cursor: 'pointer',
+                  width: '100%',
+                  textAlign: 'left',
+                }}
+                onClick={handleLogout}
+              >
                 <i className="fas fa-sign-out-alt" style={{ width: '18px' }} />
                 Đăng xuất
               </button>
             </>
           ) : (
-            <Link to="/auth/login" className="pl-mobile-link" style={{ color: '#0ea5e9', fontWeight: 600 }}>
+            <Link
+              to="/auth/login"
+              className="pl-mobile-link"
+              style={{ color: '#0ea5e9', fontWeight: 600 }}
+            >
               <i className="fas fa-sign-in-alt" style={{ width: '18px' }} />
               Đăng nhập
             </Link>
@@ -404,16 +513,35 @@ export const PublicLayout: React.FC = () => {
             {/* Brand */}
             <div>
               <div className="pl-footer-brand">
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #0ea5e9, #06b6d4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <i className="fas fa-car-side" style={{ color: 'white', fontSize: '16px' }} />
+                <div
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #0ea5e9, #06b6d4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <i
+                    className="fas fa-car-side"
+                    style={{ color: 'white', fontSize: '16px' }}
+                  />
                 </div>
                 MTProAuto
               </div>
               <p className="pl-footer-desc">
-                Hệ thống quản lý gara ô tô chuyên nghiệp, cung cấp dịch vụ sửa chữa và bảo dưỡng xe hơi chất lượng cao tại Quảng Ngãi.
+                Hệ thống quản lý gara ô tô chuyên nghiệp, cung cấp dịch vụ sửa
+                chữa và bảo dưỡng xe hơi chất lượng cao tại Quảng Ngãi.
               </p>
               <div className="pl-footer-socials">
-                {['fa-facebook-f', 'fa-youtube', 'fa-tiktok', 'fa-instagram'].map(icon => (
+                {[
+                  'fa-facebook-f',
+                  'fa-youtube',
+                  'fa-tiktok',
+                  'fa-instagram',
+                ].map(icon => (
                   <a key={icon} href="#" className="pl-social-btn">
                     <i className={`fab ${icon}`} />
                   </a>
@@ -426,7 +554,10 @@ export const PublicLayout: React.FC = () => {
               <div className="pl-footer-title">Điều hướng</div>
               {NAV_LINKS.map(link => (
                 <Link key={link.to} to={link.to} className="pl-footer-link">
-                  <i className={`fas ${link.icon}`} style={{ fontSize: '12px', width: '14px' }} />
+                  <i
+                    className={`fas ${link.icon}`}
+                    style={{ fontSize: '12px', width: '14px' }}
+                  />
                   {link.label}
                 </Link>
               ))}
@@ -437,12 +568,27 @@ export const PublicLayout: React.FC = () => {
               <div className="pl-footer-title">Tài khoản</div>
               {[
                 { to: '/customer/profile', icon: 'fa-user', label: 'Hồ sơ' },
-                { to: '/customer/orders', icon: 'fa-shopping-bag', label: 'Đơn hàng' },
-                { to: '/customer/service-requests', icon: 'fa-clipboard-list', label: 'Dịch vụ' },
-                { to: '/customer/cart', icon: 'fa-shopping-cart', label: 'Giỏ hàng' },
+                {
+                  to: '/customer/orders',
+                  icon: 'fa-shopping-bag',
+                  label: 'Đơn hàng',
+                },
+                {
+                  to: '/customer/service-requests',
+                  icon: 'fa-clipboard-list',
+                  label: 'Dịch vụ',
+                },
+                {
+                  to: '/customer/cart',
+                  icon: 'fa-shopping-cart',
+                  label: 'Giỏ hàng',
+                },
               ].map(item => (
                 <Link key={item.to} to={item.to} className="pl-footer-link">
-                  <i className={`fas ${item.icon}`} style={{ fontSize: '12px', width: '14px' }} />
+                  <i
+                    className={`fas ${item.icon}`}
+                    style={{ fontSize: '12px', width: '14px' }}
+                  />
                   {item.label}
                 </Link>
               ))}
@@ -452,10 +598,26 @@ export const PublicLayout: React.FC = () => {
             <div>
               <div className="pl-footer-title">Liên hệ</div>
               {[
-                { icon: 'fa-phone-alt', label: 'Hotline', value: '038 442 4567' },
-                { icon: 'fa-envelope', label: 'Email', value: 'contact@garagego.vn' },
-                { icon: 'fa-map-marker-alt', label: 'Địa chỉ', value: 'Ngã 4 An Dương Vương, Quảng Ngãi' },
-                { icon: 'fa-clock', label: 'Giờ làm việc', value: 'T2–T7: 7:30 – 17:30' },
+                {
+                  icon: 'fa-phone-alt',
+                  label: 'Hotline',
+                  value: '038 442 4567',
+                },
+                {
+                  icon: 'fa-envelope',
+                  label: 'Email',
+                  value: 'contact@garagego.vn',
+                },
+                {
+                  icon: 'fa-map-marker-alt',
+                  label: 'Địa chỉ',
+                  value: 'Ngã 4 An Dương Vương, Quảng Ngãi',
+                },
+                {
+                  icon: 'fa-clock',
+                  label: 'Giờ làm việc',
+                  value: 'T2–T7: 7:30 – 17:30',
+                },
               ].map(item => (
                 <div key={item.icon} className="pl-footer-contact">
                   <div className="pl-footer-contact-icon">

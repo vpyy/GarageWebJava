@@ -176,7 +176,9 @@ const cartSlice = createSlice({
         state.error = null;
       } else {
         // Load cart của user này khi đăng nhập
-        const savedCart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
+        const savedCart = JSON.parse(
+          localStorage.getItem(getCartKey()) || '[]'
+        );
         state.items = savedCart;
         const totals = calculateTotals(savedCart);
         state.total = totals.total;

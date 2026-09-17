@@ -225,7 +225,10 @@ export const AdminDashboard: React.FC = () => {
             const maxDoanhThu = Math.max(...fullYear.map(x => x.doanhThu), 1);
 
             return (
-              <div className="flex items-end justify-between gap-1 mt-4" style={{ height: '200px' }}>
+              <div
+                className="flex items-end justify-between gap-1 mt-4"
+                style={{ height: '200px' }}
+              >
                 {fullYear.map((item, index) => {
                   const height = (item.doanhThu / maxDoanhThu) * 100;
                   const isCurrentMonth = item.thang === thangHienTai;
@@ -280,15 +283,36 @@ export const AdminDashboard: React.FC = () => {
           {/* Legend */}
           <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100">
             <div className="flex items-center gap-1.5">
-              <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: 'linear-gradient(180deg, #3b82f6, #1d4ed8)' }} />
+              <div
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '3px',
+                  background: 'linear-gradient(180deg, #3b82f6, #1d4ed8)',
+                }}
+              />
               <span className="text-xs text-gray-500">Tháng hiện tại</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#bfdbfe' }} />
+              <div
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '3px',
+                  background: '#bfdbfe',
+                }}
+              />
               <span className="text-xs text-gray-500">Có doanh thu</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#f1f5f9' }} />
+              <div
+                style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '3px',
+                  background: '#f1f5f9',
+                }}
+              />
               <span className="text-xs text-gray-500">Chưa có dữ liệu</span>
             </div>
           </div>

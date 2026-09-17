@@ -83,7 +83,8 @@ export const RegisterPage: React.FC = () => {
       style={{
         minHeight: '100vh',
         display: 'flex',
-        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        fontFamily:
+          "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
         background: '#0a0f1e',
       }}
     >
@@ -236,7 +237,6 @@ export const RegisterPage: React.FC = () => {
       `}</style>
 
       <div className="reg-page-wrap" style={{ display: 'flex', width: '100%' }}>
-
         {/* ══════════════════════════════════════
             LEFT — Ảnh xe thật + benefits
         ══════════════════════════════════════ */}
@@ -288,7 +288,8 @@ export const RegisterPage: React.FC = () => {
               right: '-5%',
               width: '50%',
               height: '50%',
-              background: 'radial-gradient(ellipse, rgba(6,182,212,0.12) 0%, transparent 70%)',
+              background:
+                'radial-gradient(ellipse, rgba(6,182,212,0.12) 0%, transparent 70%)',
               pointerEvents: 'none',
             }}
           />
@@ -319,13 +320,29 @@ export const RegisterPage: React.FC = () => {
                   animation: 'float 3s ease-in-out infinite',
                 }}
               >
-                <i className="fas fa-car-side" style={{ color: 'white', fontSize: '19px' }} />
+                <i
+                  className="fas fa-car-side"
+                  style={{ color: 'white', fontSize: '19px' }}
+                />
               </div>
               <div>
-                <div style={{ color: 'white', fontWeight: 800, fontSize: '18px', lineHeight: 1.1 }}>
+                <div
+                  style={{
+                    color: 'white',
+                    fontWeight: 800,
+                    fontSize: '18px',
+                    lineHeight: 1.1,
+                  }}
+                >
                   MTProAuto
                 </div>
-                <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '11px', letterSpacing: '1px' }}>
+                <div
+                  style={{
+                    color: 'rgba(255,255,255,0.45)',
+                    fontSize: '11px',
+                    letterSpacing: '1px',
+                  }}
+                >
                   GARAGE MANAGEMENT
                 </div>
               </div>
@@ -369,7 +386,8 @@ export const RegisterPage: React.FC = () => {
                 <br />
                 <span
                   style={{
-                    background: 'linear-gradient(90deg, #67e8f9, #06b6d4, #38bdf8)',
+                    background:
+                      'linear-gradient(90deg, #67e8f9, #06b6d4, #38bdf8)',
                     backgroundSize: '200% auto',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -389,17 +407,39 @@ export const RegisterPage: React.FC = () => {
                   marginBottom: '28px',
                 }}
               >
-                Đăng ký ngay để nhận ưu đãi đặc biệt và trải nghiệm dịch vụ
-                bảo dưỡng xe hơi chuyên nghiệp hàng đầu.
+                Đăng ký ngay để nhận ưu đãi đặc biệt và trải nghiệm dịch vụ bảo
+                dưỡng xe hơi chuyên nghiệp hàng đầu.
               </p>
 
               {/* Benefits */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}
+              >
                 {[
-                  { icon: 'fa-calendar-check', color: '#34d399', text: 'Đặt lịch dịch vụ trực tuyến 24/7' },
-                  { icon: 'fa-shopping-bag',   color: '#fbbf24', text: 'Mua phụ tùng chính hãng giá tốt nhất' },
-                  { icon: 'fa-history',        color: '#a78bfa', text: 'Theo dõi toàn bộ lịch sử bảo dưỡng' },
-                  { icon: 'fa-headset',        color: '#38bdf8', text: 'Hỗ trợ khách hàng tận tâm 24/7' },
+                  {
+                    icon: 'fa-calendar-check',
+                    color: '#34d399',
+                    text: 'Đặt lịch dịch vụ trực tuyến 24/7',
+                  },
+                  {
+                    icon: 'fa-shopping-bag',
+                    color: '#fbbf24',
+                    text: 'Mua phụ tùng chính hãng giá tốt nhất',
+                  },
+                  {
+                    icon: 'fa-history',
+                    color: '#a78bfa',
+                    text: 'Theo dõi toàn bộ lịch sử bảo dưỡng',
+                  },
+                  {
+                    icon: 'fa-headset',
+                    color: '#38bdf8',
+                    text: 'Hỗ trợ khách hàng tận tâm 24/7',
+                  },
                 ].map(b => (
                   <div key={b.icon} className="benefit-item">
                     <div
@@ -415,9 +455,17 @@ export const RegisterPage: React.FC = () => {
                         flexShrink: 0,
                       }}
                     >
-                      <i className={`fas ${b.icon}`} style={{ color: b.color, fontSize: '13px' }} />
+                      <i
+                        className={`fas ${b.icon}`}
+                        style={{ color: b.color, fontSize: '13px' }}
+                      />
                     </div>
-                    <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px' }}>
+                    <span
+                      style={{
+                        color: 'rgba(255,255,255,0.8)',
+                        fontSize: '13px',
+                      }}
+                    >
                       {b.text}
                     </span>
                   </div>
@@ -445,7 +493,6 @@ export const RegisterPage: React.FC = () => {
           }}
         >
           <div style={{ animation: 'fadeUp 0.6s ease' }}>
-
             {/* Header */}
             <div style={{ marginBottom: '30px' }}>
               <div
@@ -461,7 +508,10 @@ export const RegisterPage: React.FC = () => {
                   boxShadow: '0 8px 24px rgba(6,182,212,0.35)',
                 }}
               >
-                <i className="fas fa-user-plus" style={{ color: 'white', fontSize: '22px' }} />
+                <i
+                  className="fas fa-user-plus"
+                  style={{ color: 'white', fontSize: '22px' }}
+                />
               </div>
               <h1
                 style={{
@@ -474,13 +524,18 @@ export const RegisterPage: React.FC = () => {
               >
                 Tạo tài khoản mới ✨
               </h1>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
+              <p
+                style={{
+                  fontSize: '14px',
+                  color: 'rgba(255,255,255,0.45)',
+                  lineHeight: 1.6,
+                }}
+              >
                 Điền thông tin bên dưới để bắt đầu hành trình cùng MTProAuto
               </p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-
               {/* Username */}
               <div style={{ marginBottom: '16px' }}>
                 <label className="reg-label">
@@ -507,7 +562,14 @@ export const RegisterPage: React.FC = () => {
               <div style={{ marginBottom: '16px' }}>
                 <label className="reg-label">
                   Email{' '}
-                  <span style={{ color: 'rgba(255,255,255,0.25)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>
+                  <span
+                    style={{
+                      color: 'rgba(255,255,255,0.25)',
+                      fontWeight: 400,
+                      textTransform: 'none',
+                      letterSpacing: 0,
+                    }}
+                  >
                     (tùy chọn)
                   </span>
                 </label>
@@ -605,7 +667,9 @@ export const RegisterPage: React.FC = () => {
                     tabIndex={-1}
                   >
                     <i
-                      className={showConfirm ? 'fas fa-eye-slash' : 'fas fa-eye'}
+                      className={
+                        showConfirm ? 'fas fa-eye-slash' : 'fas fa-eye'
+                      }
                       style={{ fontSize: '14px' }}
                     />
                   </button>
@@ -685,14 +749,17 @@ export const RegisterPage: React.FC = () => {
                 lineHeight: 1.7,
               }}
             >
-              <i className="fas fa-lock" style={{ marginRight: '5px', color: '#34d399' }} />
-              Thông tin của bạn được bảo mật tuyệt đối. Bằng cách đăng ký, bạn đồng ý với{' '}
+              <i
+                className="fas fa-lock"
+                style={{ marginRight: '5px', color: '#34d399' }}
+              />
+              Thông tin của bạn được bảo mật tuyệt đối. Bằng cách đăng ký, bạn
+              đồng ý với{' '}
               <a href="#" style={{ color: '#67e8f9', textDecoration: 'none' }}>
                 Điều khoản dịch vụ
               </a>{' '}
               của chúng tôi.
             </div>
-
           </div>
         </div>
       </div>

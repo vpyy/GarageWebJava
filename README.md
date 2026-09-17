@@ -15,6 +15,34 @@
 
 ---
 
+## 📝 TÓM TẮT DỰ ÁN 
+
+### **GarageGo - Hệ thống quản lý gara ô tô Full-Stack**
+
+**Mô tả ngắn gọn:**
+Ứng dụng web quản lý gara ô tô toàn diện với 2 vai trò (Admin/Customer), hỗ trợ đặt lịch dịch vụ, mua sắm phụ tùng, quản lý khách hàng, xe, hóa đơn và thống kê doanh thu.
+
+**Công nghệ sử dụng:**
+- **Backend:** Java 17, Spring Boot 3.2, Spring Security, JWT Authentication, Spring Data JPA, MySQL 8.0, Redis
+- **Frontend:** React 18, TypeScript, Redux Toolkit, React Router v6, Tailwind CSS, Axios, React Hook Form
+- **DevOps:** Docker Compose, Nginx, Maven
+
+**Tính năng chính:**
+- **Khách hàng:** Đặt lịch dịch vụ (13 loại), mua phụ tùng (giỏ hàng), theo dõi đơn hàng, quản lý hồ sơ & xe
+- **Admin:** Dashboard thống kê, quản lý CRUD (khách hàng, xe, dịch vụ, sản phẩm, hóa đơn), báo cáo doanh thu
+- **Bảo mật:** JWT (Access + Refresh Token), BCrypt, Role-based Access Control, CORS
+
+**Kết quả:**
+- 11 bảng database với triggers/stored procedures tự động hóa
+- 10 REST API controllers với 50+ endpoints
+- 19 trang frontend responsive với dark theme
+- Dockerized với health checks cho MySQL, Redis, Backend
+- API documentation với Swagger UI
+
+**Vai trò:** Full-Stack Developer (thiết kế database, phát triển backend API, xây dựng frontend UI/UX, deployment)
+
+---
+
 ## 📋 Mục lục
 
 - [Tính năng](#-tính-năng)

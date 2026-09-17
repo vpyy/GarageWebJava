@@ -73,7 +73,8 @@ export const LoginPage: React.FC = () => {
       style={{
         minHeight: '100vh',
         display: 'flex',
-        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        fontFamily:
+          "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
         background: '#0a0f1e',
       }}
     >
@@ -252,8 +253,10 @@ export const LoginPage: React.FC = () => {
         }
       `}</style>
 
-      <div className="login-page-wrap" style={{ display: 'flex', width: '100%' }}>
-
+      <div
+        className="login-page-wrap"
+        style={{ display: 'flex', width: '100%' }}
+      >
         {/* ══════════════════════════════════════
             LEFT — Ảnh xe thật + branding
         ══════════════════════════════════════ */}
@@ -305,7 +308,8 @@ export const LoginPage: React.FC = () => {
               left: '-10%',
               width: '60%',
               height: '40%',
-              background: 'radial-gradient(ellipse, rgba(14,165,233,0.15) 0%, transparent 70%)',
+              background:
+                'radial-gradient(ellipse, rgba(14,165,233,0.15) 0%, transparent 70%)',
               pointerEvents: 'none',
             }}
           />
@@ -336,13 +340,29 @@ export const LoginPage: React.FC = () => {
                   animation: 'pulse-ring 2.5s ease-in-out infinite',
                 }}
               >
-                <i className="fas fa-car-side" style={{ color: 'white', fontSize: '19px' }} />
+                <i
+                  className="fas fa-car-side"
+                  style={{ color: 'white', fontSize: '19px' }}
+                />
               </div>
               <div>
-                <div style={{ color: 'white', fontWeight: 800, fontSize: '18px', lineHeight: 1.1 }}>
+                <div
+                  style={{
+                    color: 'white',
+                    fontWeight: 800,
+                    fontSize: '18px',
+                    lineHeight: 1.1,
+                  }}
+                >
                   MTProAuto
                 </div>
-                <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '11px', letterSpacing: '1px' }}>
+                <div
+                  style={{
+                    color: 'rgba(255,255,255,0.45)',
+                    fontSize: '11px',
+                    letterSpacing: '1px',
+                  }}
+                >
                   GARAGE MANAGEMENT
                 </div>
               </div>
@@ -386,7 +406,8 @@ export const LoginPage: React.FC = () => {
                 <br />
                 <span
                   style={{
-                    background: 'linear-gradient(90deg, #38bdf8, #06b6d4, #0ea5e9)',
+                    background:
+                      'linear-gradient(90deg, #38bdf8, #06b6d4, #0ea5e9)',
                     backgroundSize: '200% auto',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -411,11 +432,24 @@ export const LoginPage: React.FC = () => {
               </p>
 
               {/* Features */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '32px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  marginBottom: '32px',
+                }}
+              >
                 {[
-                  { icon: 'fa-tools',          text: 'Sửa chữa & bảo dưỡng chuyên sâu' },
-                  { icon: 'fa-shield-check',   text: 'Phụ tùng chính hãng, bảo hành dài hạn' },
-                  { icon: 'fa-clock',          text: 'Đặt lịch linh hoạt, giao xe đúng hẹn' },
+                  { icon: 'fa-tools', text: 'Sửa chữa & bảo dưỡng chuyên sâu' },
+                  {
+                    icon: 'fa-shield-check',
+                    text: 'Phụ tùng chính hãng, bảo hành dài hạn',
+                  },
+                  {
+                    icon: 'fa-clock',
+                    text: 'Đặt lịch linh hoạt, giao xe đúng hẹn',
+                  },
                 ].map(f => (
                   <div key={f.icon} className="feature-pill">
                     <div
@@ -423,16 +457,27 @@ export const LoginPage: React.FC = () => {
                         width: '30px',
                         height: '30px',
                         borderRadius: '8px',
-                        background: 'linear-gradient(135deg, rgba(14,165,233,0.3), rgba(6,182,212,0.2))',
+                        background:
+                          'linear-gradient(135deg, rgba(14,165,233,0.3), rgba(6,182,212,0.2))',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         flexShrink: 0,
                       }}
                     >
-                      <i className={`fas ${f.icon}`} style={{ color: '#38bdf8', fontSize: '12px' }} />
+                      <i
+                        className={`fas ${f.icon}`}
+                        style={{ color: '#38bdf8', fontSize: '12px' }}
+                      />
                     </div>
-                    <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px' }}>{f.text}</span>
+                    <span
+                      style={{
+                        color: 'rgba(255,255,255,0.8)',
+                        fontSize: '13px',
+                      }}
+                    >
+                      {f.text}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -442,13 +487,26 @@ export const LoginPage: React.FC = () => {
                 {[
                   { val: '2,500+', label: 'Khách hàng tin tùng' },
                   { val: '8,000+', label: 'Xe đã phục vụ' },
-                  { val: '4.9 ★',  label: 'Điểm đánh giá' },
+                  { val: '4.9 ★', label: 'Điểm đánh giá' },
                 ].map(s => (
                   <div key={s.label} className="stat-badge" style={{ flex: 1 }}>
-                    <div style={{ fontSize: '1.3rem', fontWeight: 900, color: 'white', lineHeight: 1.2 }}>
+                    <div
+                      style={{
+                        fontSize: '1.3rem',
+                        fontWeight: 900,
+                        color: 'white',
+                        lineHeight: 1.2,
+                      }}
+                    >
                       {s.val}
                     </div>
-                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginTop: '3px' }}>
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        color: 'rgba(255,255,255,0.5)',
+                        marginTop: '3px',
+                      }}
+                    >
                       {s.label}
                     </div>
                   </div>
@@ -476,7 +534,6 @@ export const LoginPage: React.FC = () => {
           }}
         >
           <div style={{ animation: 'fadeUp 0.6s ease' }}>
-
             {/* Header */}
             <div style={{ marginBottom: '38px' }}>
               <div
@@ -492,7 +549,10 @@ export const LoginPage: React.FC = () => {
                   boxShadow: '0 8px 24px rgba(14,165,233,0.35)',
                 }}
               >
-                <i className="fas fa-sign-in-alt" style={{ color: 'white', fontSize: '22px' }} />
+                <i
+                  className="fas fa-sign-in-alt"
+                  style={{ color: 'white', fontSize: '22px' }}
+                />
               </div>
               <h1
                 style={{
@@ -505,14 +565,19 @@ export const LoginPage: React.FC = () => {
               >
                 Chào mừng trở lại 👋
               </h1>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
+              <p
+                style={{
+                  fontSize: '14px',
+                  color: 'rgba(255,255,255,0.45)',
+                  lineHeight: 1.6,
+                }}
+              >
                 Đăng nhập để tiếp tục quản lý và sử dụng dịch vụ
               </p>
             </div>
 
             {/* Form */}
             <form onSubmit={handleSubmit(onSubmit)}>
-
               {/* Username */}
               <div style={{ marginBottom: '20px' }}>
                 <label className="login-label">Tên đăng nhập</label>
@@ -565,7 +630,9 @@ export const LoginPage: React.FC = () => {
                     tabIndex={-1}
                   >
                     <i
-                      className={showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'}
+                      className={
+                        showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'
+                      }
                       style={{ fontSize: '14px' }}
                     />
                   </button>
@@ -596,7 +663,11 @@ export const LoginPage: React.FC = () => {
               </div>
 
               {/* Submit */}
-              <button type="submit" disabled={isSubmitting} className="login-btn">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="login-btn"
+              >
                 {isSubmitting ? (
                   <>
                     <div
@@ -650,35 +721,82 @@ export const LoginPage: React.FC = () => {
 
             {/* Divider */}
             <div className="login-divider">
-              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.25)', whiteSpace: 'nowrap' }}>
+              <span
+                style={{
+                  fontSize: '11px',
+                  color: 'rgba(255,255,255,0.25)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 TÀI KHOẢN DEMO
               </span>
             </div>
 
             {/* Demo accounts */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '10px',
+              }}
+            >
               {[
-                { role: 'Admin',    user: 'admin',    icon: 'fa-shield-alt', color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.2)' },
-                { role: 'Customer', user: 'customer', icon: 'fa-user',       color: '#38bdf8', bg: 'rgba(56,189,248,0.1)',  border: 'rgba(56,189,248,0.2)'  },
+                {
+                  role: 'Admin',
+                  user: 'admin',
+                  icon: 'fa-shield-alt',
+                  color: '#a78bfa',
+                  bg: 'rgba(167,139,250,0.1)',
+                  border: 'rgba(167,139,250,0.2)',
+                },
+                {
+                  role: 'Customer',
+                  user: 'customer',
+                  icon: 'fa-user',
+                  color: '#38bdf8',
+                  bg: 'rgba(56,189,248,0.1)',
+                  border: 'rgba(56,189,248,0.2)',
+                },
               ].map(a => (
                 <div
                   key={a.role}
                   className="demo-card"
                   style={{ borderColor: a.border, background: a.bg }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '4px' }}>
-                    <i className={`fas ${a.icon}`} style={{ color: a.color, fontSize: '11px' }} />
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: a.color }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '7px',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    <i
+                      className={`fas ${a.icon}`}
+                      style={{ color: a.color, fontSize: '11px' }}
+                    />
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: a.color,
+                      }}
+                    >
                       {a.role}
                     </span>
                   </div>
-                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace' }}>
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: 'rgba(255,255,255,0.4)',
+                      fontFamily: 'monospace',
+                    }}
+                  >
                     {a.user} / 123456
                   </div>
                 </div>
               ))}
             </div>
-
           </div>
         </div>
       </div>

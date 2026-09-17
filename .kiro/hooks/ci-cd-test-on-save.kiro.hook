@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "name": "🧪 Run Tests on File Save",
+  "description": "Tự động chạy tests khi bạn lưu file Java hoặc TypeScript để kiểm tra code quality ngay lập tức",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "GarageGo-BEJava/src/test/**/*.java",
+      "GarageGo-FE/src/**/*.test.ts"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "File test đã được sửa. Hãy giúp tôi:\n1. Kiểm tra file test có lỗi syntax không\n2. Gợi ý cải thiện test (coverage, edge cases)\n3. Nếu là Java test, chỉ cho tôi cách chạy test này với Maven\n4. Nếu là TypeScript test, chỉ cho tôi cách chạy với npm"
+  }
+}
