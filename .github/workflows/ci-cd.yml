@@ -75,7 +75,7 @@ jobs:
       - name: 📦 Install Frontend Dependencies
         run: |
           cd GarageGo-FE
-          npm ci  # Sạch hơn npm install
+          npm install
 
       - name: 🔍 Run ESLint
         run: |
