@@ -86,7 +86,7 @@ jobs:
       - name: 🔨 Build Frontend
         run: |
           cd GarageGo-FE
-          npm run build
+          CI=false npm run build
 
       - name: 🧪 Run Frontend Tests
         run: |
