@@ -59,7 +59,9 @@ export const CheckoutPage: React.FC = () => {
     try {
       const s = sessionStorage.getItem('checkoutItems');
       if (s) return JSON.parse(s);
-    } catch {}
+    } catch (e) {
+      // eslint-disable-next-line no-empty
+    }
     return allCartItems;
   })();
 
