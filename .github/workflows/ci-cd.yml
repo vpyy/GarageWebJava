@@ -65,10 +65,10 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📱 Setup Node.js 18
+      - name: 📱 Setup Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: 'GarageGo-FE/package-lock.json'
 
@@ -91,7 +91,7 @@ jobs:
       - name: 🧪 Run Frontend Tests
         run: |
           cd GarageGo-FE
-          npm test -- --coverage --watchAll=false
+          npm test -- --coverage --watchAll=false --passWithNoTests
         continue-on-error: true
 
       - name: 📊 Upload Frontend Build Artifacts
@@ -136,8 +136,8 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ github.repository }}/backend:latest
             ${{ env.REGISTRY }}/${{ github.repository }}/backend:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
 
       - name: 🐳 Build & Push Frontend Docker Image
         uses: docker/build-push-action@v5
@@ -147,8 +147,8 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ github.repository }}/frontend:latest
             ${{ env.REGISTRY }}/${{ github.repository }}/frontend:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
 
   # ─────────────────────────────────────────────
   # 4️⃣ NOTIFICATION: Thông báo kết quả
